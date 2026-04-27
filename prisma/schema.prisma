@@ -1,0 +1,325 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  chats     Chat[]
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  agentSlug String   @default("default")
+  message   String
+  response  String
+  model     String
+  createdAt DateTime @default(now())
+}
+
+model Agent {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  description    String
+  icon           String   @default("🤖")
+  category       String   @default("general")
+  personality    String   @default("")
+  systemPrompt   String
+  skills         String   @default("[]")
+  tier           String   @default("standard")
+  priceET        Int      @default(0)
+  perUseET       Int      @default(10)
+  isActive       Boolean  @default(true)
+  isAutonomous   Boolean  @default(false)
+  tools          String   @default("[]")
+  offlineCapable Boolean  @default(true)
+  knowledgeBase  String   @default("[]")
+  growthData     String   @default("{}")
+  localModelSize String   @default("1.5B")
+  createdAt      DateTime @default(now())
+  schedules      Schedule[]
+  monitors       Monitor[]
+}
+
+model Schedule {
+  id        String   @id @default(cuid())
+  agentSlug String
+  agent     Agent    @relation(fields: [agentSlug], references: [slug])
+  userId    String
+  cronExpr  String
+  prompt    String
+  isActive  Boolean  @default(true)
+  lastRun   DateTime?
+  nextRun   DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Monitor {
+  id         String   @id @default(cuid())
+  agentSlug  String
+  agent      Agent    @relation(fields: [agentSlug], references: [slug])
+  userId     String
+  condition  String
+  prompt     String
+  isActive   Boolean  @default(true)
+  lastCheck  DateTime?
+  triggered  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model AgentMemory {
+  id          String   @id @default(cuid())
+  agentSlug   String
+  userId      String
+  memoryType  String   @default("conversation")
+  content     String
+  importance  Float    @default(0.5)
+  accessCount Int      @default(0)
+  lastAccess  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  @@index([agentSlug, userId])
+}
+
+model AgentEvolution {
+  id            String   @id @default(cuid())
+  agentSlug     String
+  version       Int      @default(1)
+  prevPrompt    String
+  newPrompt     String
+  reason        String
+  scoreBefore   Float    @default(0)
+  scoreAfter    Float    @default(0)
+  feedbackCount Int      @default(0)
+  appliedAt     DateTime @default(now())
+}
+
+model ChatFeedback {
+  id        String   @id @default(cuid())
+  chatId    String
+  agentSlug String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Knowledge {
+  id        String   @id @default(cuid())
+  agentSlug String?
+  title     String
+  content   String
+  category  String   @default("general")
+  source    String   @default("manual")
+  embedding String?
+  useCount  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AgentMetrics {
+  id            String   @id @default(cuid())
+  agentSlug     String   @unique
+  totalChats    Int      @default(0)
+  avgRating     Float    @default(0)
+  avgLatencyMs  Float    @default(0)
+  successRate   Float    @default(1.0)
+  knowledgeHits Int      @default(0)
+  lastActive    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AgentLearning {
+  id        String   @id @default(cuid())
+  agentSlug String
+  userId    String?
+  question  String
+  answer    String
+  quality   Int      @default(0)
+  source    String   @default("conversation")
+  learned   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([agentSlug, quality])
+}
+
+// ─── AI MARKET ────────────────────────────────────────────────
+
+model Product {
+  id             String    @id @default(cuid())
+  title          String
+  description    String
+  price          Float
+  currency       String    @default("ET")
+  category       String    @default("general")
+  tags           String    @default("[]")
+  images         String    @default("[]")
+  sellerId       String?
+  sellerName     String    @default("익명")
+  sellerRating   Float     @default(0)
+  stock          Int       @default(1)
+  status         String    @default("active")
+  verifiedAt     DateTime?
+  verifyScore    Float?
+  verifyComment  String?
+  viewCount      Int       @default(0)
+  buyCount       Int       @default(0)
+  embedding      String?
+  region         String    @default("서울")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  orders         Order[]
+  groupBuys      GroupBuy[]
+  reviews        Review[]
+  verification   ProductVerification?
+  priceHistory   PriceHistory[]
+  negotiations   NegotiationSession[]
+}
+
+model Order {
+  id           String    @id @default(cuid())
+  productId    String
+  product      Product   @relation(fields: [productId], references: [id])
+  buyerId      String?
+  buyerEmail   String?
+  buyerName    String    @default("익명")
+  quantity     Int       @default(1)
+  unitPrice    Float
+  totalPrice   Float
+  currency     String    @default("ET")
+  status       String    @default("pending")
+  groupBuyId   String?
+  groupBuy     GroupBuy? @relation(fields: [groupBuyId], references: [id])
+  memo         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model GroupBuy {
+  id              String    @id @default(cuid())
+  productId       String
+  product         Product   @relation(fields: [productId], references: [id])
+  title           String
+  description     String    @default("")
+  targetCount     Int
+  currentCount    Int       @default(0)
+  discountRate    Float     @default(0)
+  basePrice       Float
+  discountedPrice Float
+  deadline        DateTime
+  status          String    @default("open")
+  embedding       String?
+  region          String    @default("서울")
+  budgetMin       Float     @default(0)
+  budgetMax       Float     @default(999999)
+  matchScore      Float     @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  participants    GroupBuyParticipant[]
+  orders          Order[]
+}
+
+model GroupBuyParticipant {
+  id         String   @id @default(cuid())
+  groupBuyId String
+  groupBuy   GroupBuy @relation(fields: [groupBuyId], references: [id])
+  userId     String?
+  name       String   @default("익명")
+  email      String?
+  joinedAt   DateTime @default(now())
+  @@index([groupBuyId])
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  reviewerName String   @default("익명")
+  rating       Int
+  comment      String   @default("")
+  helpful      Int      @default(0)
+  createdAt    DateTime @default(now())
+  @@index([productId])
+}
+
+// ─── AI MARKET V2 신규 모델 ────────────────────────────────────
+
+model ProductVerification {
+  id                  String   @id @default(cuid())
+  productId           String   @unique
+  product             Product  @relation(fields: [productId], references: [id])
+  priceScore          Float    @default(0)
+  sellerScore         Float    @default(0)
+  descriptionScore    Float    @default(0)
+  metaScore           Float    @default(0)
+  reviewScore         Float    @default(0)
+  totalScore          Float    @default(0)
+  grade               String   @default("")
+  priceComment        String   @default("")
+  sellerComment       String   @default("")
+  descriptionComment  String   @default("")
+  metaComment         String   @default("")
+  reviewComment       String   @default("")
+  overallComment      String   @default("")
+  risks               String   @default("[]")
+  verifiedAt          DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model SellerReputation {
+  id              String   @id @default(cuid())
+  sellerId        String   @unique
+  sellerName      String
+  completionRate  Float    @default(0)
+  avgRating       Float    @default(0)
+  responseSpeed   Float    @default(0)
+  claimRate       Float    @default(0)
+  activeDays      Int      @default(0)
+  totalScore      Float    @default(0)
+  badge           String   @default("브론즈")
+  calculatedAt    DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  price     Float
+  date      DateTime @default(now())
+  @@index([productId, date])
+}
+
+model NegotiationSession {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id])
+  buyerId      String?
+  sellerId     String?
+  status       String   @default("active")
+  initialPrice Float
+  agreedPrice  Float?
+  currentTurn  Int      @default(0)
+  maxTurns     Int      @default(5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  messages     NegotiationMessage[]
+}
+
+model NegotiationMessage {
+  id            String             @id @default(cuid())
+  sessionId     String
+  session       NegotiationSession @relation(fields: [sessionId], references: [id])
+  role          String
+  agentType     String
+  content       String
+  proposedPrice Float?
+  createdAt     DateTime           @default(now())
+}
