@@ -11,3 +11,18 @@ venv/
 __pycache__/
 logs/
 *.backup-v1
+
+# ── 대용량 AI 가중치 / 체크포인트 / 백업 (git 추적 금지) ──
+models/
+backup-2026-05-02/
+finetune/adapters/
+finetune/datasets/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+*.ckpt
+*.onnx
+*.parquet
+tsconfig.tsbuildinfo

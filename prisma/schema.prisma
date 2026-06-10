@@ -8,73 +8,128 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  chats     Chat[]
+  id          String         @id @default(cuid())
+  email       String         @unique
+  name        String?
+  createdAt   DateTime       @default(now())
+  budgetRange String?
+  region      String?
+  chats       Chat[]
+  behaviors   UserBehavior[]
+
+  // ─── Dual-Shield 토큰 가드 / 바이너리 MLM 확장 ───
+  sponsorId          String? // 직추천인 ID
+  parentId           String? // 바이너리 트리 상위 ID
+  position           String? // "LEFT" 또는 "RIGHT"
+  epBalance          Float   @default(0.0) // 수당이 쌓이는 현금 포인트 지갑
+  subscriptionStatus String  @default("ACTIVE") // ACTIVE, INACTIVE
+
+  tokenQuota   TokenQuota?
+  legBalance   LegBalance?
+  transactions Transaction[]
+
+  @@index([sponsorId])
+  @@index([parentId])
+}
+
+// 좌/우 다리별 누적 PV/BV 원장 (무한 뎁스 실적 + 이월 관리)
+// 정산 시 약한 다리를 매칭·소진하고, 남은 볼륨은 이 테이블에 그대로 남아 자동 이월된다.
+model LegBalance {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leftPV    Float    @default(0) // 좌측 다리 미매칭 누적 포인트 볼륨
+  rightPV   Float    @default(0) // 우측 다리 미매칭 누적 포인트 볼륨
+  leftBV    Float    @default(0) // 좌측 다리 미매칭 누적 비즈니스 볼륨 (과지급 제어용)
+  rightBV   Float    @default(0) // 우측 다리 미매칭 누적 비즈니스 볼륨
+  updatedAt DateTime @updatedAt
+}
+
+// 회사의 파산을 막는 물리적 방어벽 (기본 2,000,000 토큰 할당)
+model TokenQuota {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allocated BigInt   @default(2000000) // 최초 가입 시 기본 제공량
+  consumed  BigInt   @default(0) // 실제 에이전트 구동 시 차감되는 양
+  updatedAt DateTime @updatedAt
+}
+
+// 매출 및 수당 발생을 기록하는 듀얼실드 트랜잭션 테이블
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  txType      String // "SUBSCRIPTION", "TOKEN_PURCHASE", "BONUS_MATCHING"
+  amount      Float // 결제 달러($) 금액 또는 수당 발생액
+  pvGenerated Float    @default(0.0) // 수당 계산용 포인트 볼륨
+  bvGenerated Float    @default(0.0) // 과지급 제어용 비즈니스 볼륨
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([txType])
 }
 
 model Chat {
   id        String   @id @default(cuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
   agentSlug String   @default("default")
   message   String
   response  String
   model     String
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Agent {
-  id             String   @id @default(cuid())
-  slug           String   @unique
+  id             String     @id @default(cuid())
+  slug           String     @unique
   name           String
   description    String
-  icon           String   @default("🤖")
-  category       String   @default("general")
-  personality    String   @default("")
+  icon           String     @default("🤖")
+  category       String     @default("general")
+  personality    String     @default("")
   systemPrompt   String
-  skills         String   @default("[]")
-  tier           String   @default("standard")
-  priceET        Int      @default(0)
-  perUseET       Int      @default(10)
-  isActive       Boolean  @default(true)
-  isAutonomous   Boolean  @default(false)
-  tools          String   @default("[]")
-  offlineCapable Boolean  @default(true)
-  knowledgeBase  String   @default("[]")
-  growthData     String   @default("{}")
-  localModelSize String   @default("1.5B")
-  createdAt      DateTime @default(now())
-  schedules      Schedule[]
+  skills         String     @default("[]")
+  tier           String     @default("standard")
+  priceET        Int        @default(0)
+  perUseET       Int        @default(10)
+  isActive       Boolean    @default(true)
+  isAutonomous   Boolean    @default(false)
+  tools          String     @default("[]")
+  offlineCapable Boolean    @default(true)
+  knowledgeBase  String     @default("[]")
+  growthData     String     @default("{}")
+  localModelSize String     @default("1.5B")
+  createdAt      DateTime   @default(now())
   monitors       Monitor[]
+  schedules      Schedule[]
 }
 
 model Schedule {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   agentSlug String
-  agent     Agent    @relation(fields: [agentSlug], references: [slug])
   userId    String
   cronExpr  String
   prompt    String
-  isActive  Boolean  @default(true)
+  isActive  Boolean   @default(true)
   lastRun   DateTime?
   nextRun   DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  agent     Agent     @relation(fields: [agentSlug], references: [slug])
 }
 
 model Monitor {
-  id         String   @id @default(cuid())
-  agentSlug  String
-  agent      Agent    @relation(fields: [agentSlug], references: [slug])
-  userId     String
-  condition  String
-  prompt     String
-  isActive   Boolean  @default(true)
-  lastCheck  DateTime?
-  triggered  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id        String    @id @default(cuid())
+  agentSlug String
+  userId    String
+  condition String
+  prompt    String
+  isActive  Boolean   @default(true)
+  lastCheck DateTime?
+  triggered Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  agent     Agent     @relation(fields: [agentSlug], references: [slug])
 }
 
 model AgentMemory {
@@ -87,6 +142,7 @@ model AgentMemory {
   accessCount Int      @default(0)
   lastAccess  DateTime @default(now())
   createdAt   DateTime @default(now())
+
   @@index([agentSlug, userId])
 }
 
@@ -147,81 +203,182 @@ model AgentLearning {
   source    String   @default("conversation")
   learned   Boolean  @default(false)
   createdAt DateTime @default(now())
+
   @@index([agentSlug, quality])
 }
 
-// ─── AI MARKET ────────────────────────────────────────────────
-
 model Product {
-  id             String    @id @default(cuid())
-  title          String
-  description    String
-  price          Float
-  currency       String    @default("ET")
-  category       String    @default("general")
-  tags           String    @default("[]")
-  images         String    @default("[]")
-  sellerId       String?
-  sellerName     String    @default("익명")
-  sellerRating   Float     @default(0)
-  stock          Int       @default(1)
-  status         String    @default("active")
-  verifiedAt     DateTime?
-  verifyScore    Float?
-  verifyComment  String?
-  viewCount      Int       @default(0)
-  buyCount       Int       @default(0)
-  embedding      String?
-  region         String    @default("서울")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  orders         Order[]
-  groupBuys      GroupBuy[]
-  reviews        Review[]
-  verification   ProductVerification?
-  priceHistory   PriceHistory[]
-  negotiations   NegotiationSession[]
+  id            String               @id @default(cuid())
+  title         String
+  description   String
+  price         Float
+  currency      String               @default("ET")
+  category      String               @default("general")
+  tags          String               @default("[]")
+  images        String               @default("[]")
+  sellerId      String?
+  sellerName    String               @default("익명")
+  sellerRating  Float                @default(0)
+  stock         Int                  @default(1)
+  status        String               @default("active")
+  verifiedAt    DateTime?
+  verifyScore   Float?
+  verifyComment String?
+  viewCount     Int                  @default(0)
+  buyCount      Int                  @default(0)
+  embedding     String?
+  region        String               @default("서울")
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  groupBuys     GroupBuy[]
+  negotiations  NegotiationSession[]
+  orders        Order[]
+  offers        Offer[]
+  priceHistory  PriceHistory[]
+  verification  ProductVerification?
+  reviews       Review[]
+  agentSessions AgentSession[]
+  sourceDrafts  ProductDraft[]
+}
+
+model ProductDraft {
+  id                  String           @id @default(cuid())
+  userId              String?
+  source              String           @default("mobile_photo")
+  status              String           @default("PHOTO_CAPTURED")
+  title               String?
+  category            String?
+  condition           String?
+  description         String?
+  tags                String           @default("[]")
+  price               Float?
+  currency            String           @default("KRW")
+  tradeMethod         String           @default("personal_trade")
+  aiAnalysis          String           @default("{}")
+  riskFlags           String           @default("[]")
+  previewCard         String           @default("{}")
+  sellerAgentEnabled  Boolean          @default(false)
+  publishedProductId  String?
+  approvedAt          DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  images              ProductImage[]
+  logs                AgentActionLog[]
+  publishedProduct    Product?         @relation(fields: [publishedProductId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([status])
+  @@index([publishedProductId])
+}
+
+model ProductImage {
+  id              String       @id @default(cuid())
+  draftId         String
+  url             String
+  storagePath     String
+  mimeType        String       @default("image/jpeg")
+  sizeBytes       Int          @default(0)
+  width           Int?
+  height          Int?
+  isPrimary       Boolean      @default(false)
+  privateInfo     String       @default("[]")
+  createdAt       DateTime     @default(now())
+  draft           ProductDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+
+  @@index([draftId])
+}
+
+model AgentSession {
+  id            String           @id @default(cuid())
+  listingId     String
+  agentType     String           @default("seller")
+  status        String           @default("SELLER_AGENT_ACTIVE")
+  userId        String?
+  context       String           @default("{}")
+  lastMessageAt DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  listing       Product          @relation(fields: [listingId], references: [id])
+  logs          AgentActionLog[]
+
+  @@index([listingId, status])
+}
+
+model AgentActionLog {
+  id          String        @id @default(cuid())
+  draftId     String?
+  sessionId   String?
+  action      String
+  status      String        @default("ok")
+  input       String        @default("{}")
+  output      String        @default("{}")
+  requiresUserConfirmation Boolean @default(false)
+  createdAt   DateTime      @default(now())
+  draft       ProductDraft? @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  session     AgentSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([draftId, createdAt])
+  @@index([sessionId, createdAt])
+  @@index([action])
+}
+
+model Offer {
+  id            String    @id @default(cuid())
+  listingId     String
+  buyerId       String?
+  buyerName     String    @default("익명 구매자")
+  buyerMessage  String    @default("")
+  offerPrice    Float
+  currency      String    @default("KRW")
+  status        String    @default("USER_CONFIRM_REQUIRED")
+  agentReply    String    @default("")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  listing       Product   @relation(fields: [listingId], references: [id])
+
+  @@index([listingId, status])
+  @@index([createdAt])
 }
 
 model Order {
-  id           String    @id @default(cuid())
-  productId    String
-  product      Product   @relation(fields: [productId], references: [id])
-  buyerId      String?
-  buyerEmail   String?
-  buyerName    String    @default("익명")
-  quantity     Int       @default(1)
-  unitPrice    Float
-  totalPrice   Float
-  currency     String    @default("ET")
-  status       String    @default("pending")
-  groupBuyId   String?
-  groupBuy     GroupBuy? @relation(fields: [groupBuyId], references: [id])
-  memo         String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  productId  String
+  buyerId    String?
+  buyerEmail String?
+  buyerName  String    @default("익명")
+  quantity   Int       @default(1)
+  unitPrice  Float
+  totalPrice Float
+  currency   String    @default("ET")
+  status     String    @default("pending")
+  groupBuyId String?
+  memo       String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  groupBuy   GroupBuy? @relation(fields: [groupBuyId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
 }
 
 model GroupBuy {
-  id              String    @id @default(cuid())
+  id              String                @id @default(cuid())
   productId       String
-  product         Product   @relation(fields: [productId], references: [id])
   title           String
-  description     String    @default("")
+  description     String                @default("")
   targetCount     Int
-  currentCount    Int       @default(0)
-  discountRate    Float     @default(0)
+  currentCount    Int                   @default(0)
+  discountRate    Float                 @default(0)
   basePrice       Float
   discountedPrice Float
   deadline        DateTime
-  status          String    @default("open")
+  status          String                @default("open")
   embedding       String?
-  region          String    @default("서울")
-  budgetMin       Float     @default(0)
-  budgetMax       Float     @default(999999)
-  matchScore      Float     @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  region          String                @default("서울")
+  budgetMin       Float                 @default(0)
+  budgetMax       Float                 @default(999999)
+  matchScore      Float                 @default(0)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  product         Product               @relation(fields: [productId], references: [id])
   participants    GroupBuyParticipant[]
   orders          Order[]
 }
@@ -229,97 +386,202 @@ model GroupBuy {
 model GroupBuyParticipant {
   id         String   @id @default(cuid())
   groupBuyId String
-  groupBuy   GroupBuy @relation(fields: [groupBuyId], references: [id])
   userId     String?
   name       String   @default("익명")
   email      String?
   joinedAt   DateTime @default(now())
+  groupBuy   GroupBuy @relation(fields: [groupBuyId], references: [id])
+
   @@index([groupBuyId])
 }
 
 model Review {
   id           String   @id @default(cuid())
   productId    String
-  product      Product  @relation(fields: [productId], references: [id])
   reviewerName String   @default("익명")
   rating       Int
   comment      String   @default("")
   helpful      Int      @default(0)
   createdAt    DateTime @default(now())
+  product      Product  @relation(fields: [productId], references: [id])
+
   @@index([productId])
 }
 
-// ─── AI MARKET V2 신규 모델 ────────────────────────────────────
-
 model ProductVerification {
-  id                  String   @id @default(cuid())
-  productId           String   @unique
-  product             Product  @relation(fields: [productId], references: [id])
-  priceScore          Float    @default(0)
-  sellerScore         Float    @default(0)
-  descriptionScore    Float    @default(0)
-  metaScore           Float    @default(0)
-  reviewScore         Float    @default(0)
-  totalScore          Float    @default(0)
-  grade               String   @default("")
-  priceComment        String   @default("")
-  sellerComment       String   @default("")
-  descriptionComment  String   @default("")
-  metaComment         String   @default("")
-  reviewComment       String   @default("")
-  overallComment      String   @default("")
-  risks               String   @default("[]")
-  verifiedAt          DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  productId          String   @unique
+  scores             String   @default("{}")
+  priceScore         Float    @default(0)
+  sellerScore        Float    @default(0)
+  descriptionScore   Float    @default(0)
+  metaScore          Float    @default(0)
+  reviewScore        Float    @default(0)
+  totalScore         Float    @default(0)
+  comments           String   @default("{}")
+  grade              String   @default("")
+  priceComment       String   @default("")
+  sellerComment      String   @default("")
+  descriptionComment String   @default("")
+  metaComment        String   @default("")
+  reviewComment      String   @default("")
+  overallComment     String   @default("")
+  warnings           String   @default("[]")
+  risks              String   @default("[]")
+  verifiedAt         DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  product            Product  @relation(fields: [productId], references: [id])
 }
 
 model SellerReputation {
-  id              String   @id @default(cuid())
-  sellerId        String   @unique
-  sellerName      String
-  completionRate  Float    @default(0)
-  avgRating       Float    @default(0)
-  responseSpeed   Float    @default(0)
-  claimRate       Float    @default(0)
-  activeDays      Int      @default(0)
-  totalScore      Float    @default(0)
-  badge           String   @default("브론즈")
-  calculatedAt    DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(cuid())
+  sellerId         String   @unique
+  sellerName       String
+  completionRate   Float    @default(0)
+  avgRating        Float    @default(0)
+  responseSpeed    Float    @default(0)
+  responseSpeedSec Float    @default(0)
+  claimRate        Float    @default(0)
+  activeDays       Int      @default(0)
+  totalScore       Float    @default(0)
+  badge            String   @default("브론즈")
+  calculatedAt     DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model PriceHistory {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  price     Float
-  date      DateTime @default(now())
+  id         String   @id @default(cuid())
+  productId  String
+  price      Float
+  date       DateTime @default(now())
+  recordedAt DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id])
+
   @@index([productId, date])
+  @@index([productId, recordedAt])
+}
+
+model UserBehavior {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  productId String?
+  query     String?
+  meta      String   @default("{}")
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([action])
 }
 
 model NegotiationSession {
-  id           String   @id @default(cuid())
+  id           String               @id @default(cuid())
   productId    String
-  product      Product  @relation(fields: [productId], references: [id])
   buyerId      String?
   sellerId     String?
-  status       String   @default("active")
+  status       String               @default("active")
   initialPrice Float
   agreedPrice  Float?
-  currentTurn  Int      @default(0)
-  maxTurns     Int      @default(5)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  finalPrice   Float?
+  transcript   String               @default("[]")
+  currentTurn  Int                  @default(0)
+  maxTurns     Int                  @default(5)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
   messages     NegotiationMessage[]
+  product      Product              @relation(fields: [productId], references: [id])
 }
 
 model NegotiationMessage {
   id            String             @id @default(cuid())
   sessionId     String
-  session       NegotiationSession @relation(fields: [sessionId], references: [id])
   role          String
   agentType     String
   content       String
   proposedPrice Float?
   createdAt     DateTime           @default(now())
+  session       NegotiationSession @relation(fields: [sessionId], references: [id])
+}
+
+// ─── SWARM ECOSYSTEM ─────────────────────────────────────────
+
+model SwarmBot {
+  id            String   @id @default(cuid())
+  persona       String   @default("{}")
+  capabilities  String   @default("[]")
+  memory        String   @default("{}")
+  reputation    Float    @default(50)
+  totalEarnings Float    @default(0)
+  status        String   @default("sleeping")
+  botType       String   @default("multipurpose")
+  parentBotId   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sales         SwarmTransaction[] @relation("seller")
+  purchases     SwarmTransaction[] @relation("buyer")
+  referrals     BotReferralChain[] @relation("parent")
+  referredBy    BotReferralChain[] @relation("child")
+  @@index([status])
+  @@index([reputation])
+}
+
+model SwarmTransaction {
+  id              String   @id @default(cuid())
+  buyerId         String
+  sellerId        String
+  productInfo     String   @default("{}")
+  finalPrice      Float
+  negotiationLog  String   @default("[]")
+  marketKeyword   String   @default("")
+  sessionId       String?
+  status          String   @default("completed")
+  timestamp       DateTime @default(now())
+  buyer           SwarmBot @relation("buyer", fields: [buyerId], references: [id])
+  seller          SwarmBot @relation("seller", fields: [sellerId], references: [id])
+  @@index([timestamp])
+  @@index([marketKeyword])
+  @@index([status])
+}
+
+model SwarmMarketSession {
+  id                  String   @id @default(cuid())
+  keyword             String
+  participatingBots   String   @default("[]")
+  duration            Int      @default(0)
+  totalTransactions   Int      @default(0)
+  totalRevenue        Float    @default(0)
+  status              String   @default("active")
+  startedAt           DateTime @default(now())
+  endedAt             DateTime?
+  @@index([keyword])
+  @@index([startedAt])
+}
+
+model BotReferralChain {
+  id          String   @id @default(cuid())
+  parentBotId String
+  childBotId  String
+  level       Int      @default(1)
+  earnings    Float    @default(0)
+  createdAt   DateTime @default(now())
+  parent      SwarmBot @relation("parent", fields: [parentBotId], references: [id])
+  child       SwarmBot @relation("child", fields: [childBotId], references: [id])
+  @@index([parentBotId])
+  @@index([childBotId])
+}
+
+model SellSession {
+  id          String   @id @default(cuid())
+  draftId     String?
+  userId      String?
+  step        String   @default("photo_uploaded")
+  context     String   @default("{}")
+  lastMessage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([draftId])
+  @@index([userId, createdAt])
+  @@index([step])
 }

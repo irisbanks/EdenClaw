@@ -8,6 +8,7 @@ const CORS_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['tbnmj-59-150-35-1.run.pinggy-free.link'],
   // 외부 접속 허용: 0.0.0.0 바인딩은 CLI 옵션으로 설정
   async headers() {
     return [

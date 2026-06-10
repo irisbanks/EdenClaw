@@ -7,25 +7,44 @@
     "dev:external": "next dev -H 0.0.0.0 -p 3000",
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 3000",
-    "start:local": "next start"
+    "start:local": "next start",
+    "engine:stress": "npx tsx scripts/run-engine-stress-test.ts",
+    "sandbox:arbitrage": "npx tsx scripts/run-sandbox-simulation.ts",
+    "test:eden-seller": "npx tsx scripts/test-eden-seller-agent.ts",
+    "finetune:export": "npx tsx finetune/scripts/export-agent-logs-to-sft.ts",
+    "finetune:eval:seller": "npx tsx finetune/scripts/eval-seller-agent.ts",
+    "finetune:eval:safety": "npx tsx finetune/scripts/eval-safety-agent.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-better-sqlite3": "^7.7.0",
     "@prisma/client": "^7.7.0",
+    "autoprefixer": "^10.5.0",
     "better-sqlite3": "^12.9.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "decimal.js": "^10.6.0",
     "ethers": "^6.16.0",
+    "ioredis": "^5.10.1",
+    "lucide-react": "^1.14.0",
     "next": "16.2.4",
+    "playwright": "^1.59.1",
+    "postcss": "^8.5.13",
     "prisma": "^7.7.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
     "resend": "^6.12.2",
-    "stripe": "^22.0.2"
+    "stripe": "^22.0.2",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

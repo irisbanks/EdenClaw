@@ -120,6 +120,7 @@ export default function MarketHome() {
         <Link href="/market" style={s.navLinkActive}>홈</Link>
         <Link href="/market/products" style={s.navLink}>상품</Link>
         <Link href="/market/group-buy" style={s.navLink}>공동구매</Link>
+        <Link href="/market/ai-compare" style={s.navLink}>AI 비교</Link>
         <Link href="/market/sell" style={s.navSell}>+ 판매하기</Link>
       </nav>
 
