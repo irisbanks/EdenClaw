@@ -9,6 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_MARKET_POINTS = 120;
+const MAX_ALIGNED_POINTS = 672;
 // Raw ticks kept for 15m/30m resampling. The public collector writes a snapshot
 // roughly every 30s, so ~2000 ticks covers more than 12h — enough to fill 48
 // fifteen-minute buckets on the shared timeline.
@@ -21,6 +22,12 @@ const SIGNAL_TAIL_BYTES = 512 * 1024;
 const ONLINE_AFTER_MS = 90_000;
 const STALE_AFTER_MS = 10 * 60_000;
 
+// Wall-clock realtime freshness gates. These are intentionally independent of
+// the selected chart timeframe / historical as-of join math: a stale bridge
+// or a stopped market collector must be flagged as STALE/OFFLINE regardless
+// of which candle bucket size the user is viewing.
+const REALTIME_PRICE_STALE_AFTER_SEC = 2 * 60;
+
 // Historical lookback ranges selectable on the mobile screen. The number is the
 // count of 15m buckets shown (1h=4, 6h=24, 24h=96, 7d=672). Default = 24h.
 const RANGE_POINTS = {
@@ -32,9 +39,9 @@ const RANGE_POINTS = {
 type RangeKey = keyof typeof RANGE_POINTS;
 
 const TIMEFRAME_STALE_SECONDS = {
-  '5m': 360,
-  '15m': 1200,
-  '30m': 2100,
+  '5m': 900,
+  '15m': 2100,
+  '30m': 3900,
 } as const;
 
 // The shared price/AI timeline is resampled to these fixed bucket widths so the
@@ -46,7 +53,8 @@ const TIMEFRAME_BUCKET_SECONDS = {
   '30m': 1800,
 } as const;
 
-type ConnectionState = 'ONLINE' | 'STALE' | 'OFFLINE';
+type SourceConnectionState = 'ONLINE' | 'STALE' | 'OFFLINE';
+type ConnectionState = 'FRESH' | 'DELAYED' | 'STALE' | 'OFFLINE';
 type CandidateStatus = 'READY' | 'WAIT' | 'BLOCKED' | 'STALE';
 type Timeframe = keyof typeof TIMEFRAME_STALE_SECONDS;
 type JsonRecord = Record<string, unknown>;
@@ -145,7 +153,7 @@ function sanitizeTelemetryPayload(input: JsonRecord): JsonRecord {
     ? input.signal_history.slice(-MAX_SIGNAL_POINTS)
     : [];
   const alignedSeries = Array.isArray(input.time_aligned_series)
-    ? input.time_aligned_series.slice(-MAX_MARKET_POINTS)
+    ? input.time_aligned_series.slice(-MAX_ALIGNED_POINTS)
     : [];
   const blockers = Array.isArray(input.blocker_breakdown) ? input.blocker_breakdown.slice(0, 24) : [];
 
@@ -279,7 +287,7 @@ function connectionState(
   updatedAt: string,
   onlineAfterMs = ONLINE_AFTER_MS,
   staleAfterMs = STALE_AFTER_MS,
-): ConnectionState {
+): SourceConnectionState {
   const timestamp = new Date(updatedAt).getTime();
   if (!Number.isFinite(timestamp)) return 'OFFLINE';
   const age = Date.now() - timestamp;
@@ -288,10 +296,134 @@ function connectionState(
   return 'OFFLINE';
 }
 
-function oldestConnection(...states: ConnectionState[]): ConnectionState {
+function oldestConnection(...states: SourceConnectionState[]): SourceConnectionState {
   if (states.includes('OFFLINE')) return 'OFFLINE';
   if (states.includes('STALE')) return 'STALE';
   return 'ONLINE';
+}
+
+// Real wall-clock age in seconds, always measured against `nowMs` — never
+// against a historical chart bucket's own end time. Returns null when the
+// timestamp is missing or unparseable (treated as maximally stale by callers).
+function computeRealAgeSec(nowMs: number, iso: string): number | null {
+  const ms = new Date(iso).getTime();
+  return Number.isFinite(ms) ? Math.max(0, Math.round((nowMs - ms) / 1000)) : null;
+}
+
+function normalizeIso(value: string): string {
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : '';
+}
+
+function newestTimestamp(...values: string[]): string {
+  return values
+    .map(normalizeIso)
+    .filter(Boolean)
+    .sort((left, right) => new Date(left).getTime() - new Date(right).getTime())
+    .at(-1) ?? '';
+}
+
+function normalizeDecision(value: unknown): 'LONG' | 'SHORT' | 'WAIT' | 'NO_SIGNAL' {
+  if (value === 'LONG' || value === 'SHORT' || value === 'WAIT') return value;
+  return 'NO_SIGNAL';
+}
+
+function realtimeSignalThresholds(timeframe: Timeframe): { fresh: number; stale: number } {
+  if (timeframe === '5m') return { fresh: 420, stale: 900 };
+  if (timeframe === '30m') return { fresh: 2100, stale: 3900 };
+  return { fresh: 1080, stale: 2100 };
+}
+
+type LiveState = 'ACTIVE' | 'NO_SIGNAL' | 'BLOCKED_STALE';
+
+// Overlays real-time freshness on top of an already-built response payload.
+// Callers must pass the *raw* signal/price timestamps from the live source
+// (the model's own signal row, the collector's own tick) — never the
+// chart's bucket-aligned `latest_signal_ts` / `latest_price_ts`, which are
+// only meaningful for the historical as-of join and carry an inherent
+// bucket-width lag (e.g. up to 15 minutes on the 15m view) that would
+// otherwise look like staleness even when the live feed is healthy.
+function applyRealtimeFreshness(
+  payload: JsonRecord,
+  nowMs: number,
+  baseConnection: SourceConnectionState,
+  rawSignalTsIso: string,
+  rawPriceTsIso: string,
+  timeframe: Timeframe,
+): JsonRecord {
+  const latestSignalTs = normalizeIso(rawSignalTsIso);
+  const latestPriceTs = normalizeIso(rawPriceTsIso);
+  const realSignalAgeSec = computeRealAgeSec(nowMs, latestSignalTs);
+  const realPriceAgeSec = computeRealAgeSec(nowMs, latestPriceTs);
+  const signalThresholds = realtimeSignalThresholds(timeframe);
+  const signalStale = realSignalAgeSec === null || realSignalAgeSec > signalThresholds.stale;
+  const priceStale = realPriceAgeSec === null || realPriceAgeSec > REALTIME_PRICE_STALE_AFTER_SEC;
+  const connection: ConnectionState =
+    baseConnection === 'OFFLINE' || realSignalAgeSec === null || realPriceAgeSec === null
+      ? 'OFFLINE'
+      : signalStale || priceStale
+        ? 'STALE'
+        : realSignalAgeSec > signalThresholds.fresh || baseConnection === 'STALE'
+          ? 'DELAYED'
+          : 'FRESH';
+  const decision = normalizeDecision(payload.decision);
+  const unsafe = connection !== 'FRESH' || signalStale || priceStale;
+  const sourceBot = asRecord(payload.bot);
+  // NO_SIGNAL (live data alive, no trade candidate) vs STALE (data itself old)
+  // are deliberately distinct states — a quiet market must never be reported
+  // the same way as a dead bridge/collector.
+  const liveState: LiveState =
+    unsafe
+      ? 'BLOCKED_STALE'
+      : decision === 'LONG' || decision === 'SHORT'
+        ? 'ACTIVE'
+        : 'NO_SIGNAL';
+  const mobileOrderCandidate = unsafe
+    ? 'BLOCKED_STALE'
+    : decision === 'LONG' || decision === 'SHORT'
+      ? decision
+      : 'NO_SIGNAL';
+
+  return {
+    ...payload,
+    server_now_ts: new Date(nowMs).toISOString(),
+    latest_signal_ts: latestSignalTs,
+    latest_price_ts: latestPriceTs,
+    real_signal_age_sec: realSignalAgeSec,
+    real_price_age_sec: realPriceAgeSec,
+    signal_age_sec: realSignalAgeSec,
+    signal_age_label: realSignalAgeSec === null ? '알 수 없음' : signalAgeLabel(realSignalAgeSec),
+    signal_stale: signalStale,
+    price_stale: priceStale,
+    live_state: liveState,
+    connection,
+    signal_cycle_state:
+      connection === 'FRESH' && timeframe === '15m'
+        ? 'FRESH_PENDING_CANDLE'
+        : connection,
+    signal_fresh_after_sec: signalThresholds.fresh,
+    signal_stale_after_sec: signalThresholds.stale,
+    decision,
+    mobile_order_candidate: mobileOrderCandidate,
+    manual_order_disabled: true,
+    dry_run: true,
+    live_trading_enabled: false,
+    real_orders_placed: 0,
+    bot: Object.keys(sourceBot).length
+      ? {
+          ...sourceBot,
+          mode: 'DRY_RUN',
+          live_trading_enabled: false,
+          real_orders_placed: 0,
+        }
+      : null,
+    readiness: {
+      ...asRecord(payload.readiness),
+      signal_timestamp: latestSignalTs,
+      signal_age_seconds: realSignalAgeSec,
+      signal_stale: signalStale,
+    },
+  };
 }
 
 async function readJson(filePath: string): Promise<JsonRecord> {
@@ -774,7 +906,7 @@ function buildCandleAlignedSeries(
         hc090_ready_pct: 0,
         overall_readiness_pct: 0,
         proximity_readiness_pct: 0,
-        decision: 'NO_SIGNAL',
+        decision: 'NO_SIGNAL_HISTORY',
         status: 'WAIT' as const,
         signal_ts: '',
         signal_age_sec: 0,
@@ -909,8 +1041,12 @@ function applyTimeframeToPayload(payload: JsonRecord, timeframe: Timeframe): Jso
 }
 
 export async function GET(req: NextRequest) {
-  const timeframe = parseTimeframe(req);
+  const nowMs = Date.now();
   const range = parseRange(req);
+  const requestedTimeframe = parseTimeframe(req);
+  // Seven days is a fixed 672-point 15m history. Ignoring tf=5m/30m here keeps
+  // range metadata, candle count and UI navigation mathematically consistent.
+  const timeframe: Timeframe = range === '7d' ? '15m' : requestedTimeframe;
   const rangePoints = RANGE_POINTS[range];
   const bucketSeconds = TIMEFRAME_BUCKET_SECONDS[timeframe];
   const rangeWindowMs = rangePoints * bucketSeconds * 1000;
@@ -1282,8 +1418,17 @@ export async function GET(req: NextRequest) {
 
     persistLatestBucket(timeAlignedSeries);
 
+    const finalPayload = withRangeMeta(localPayload, timeAlignedSeries, priceSource);
+    const baseConnection = oldestConnection(bridgeState, collectorState, sourceState);
+    // Raw live-source timestamps: the model's own last signal row and the
+    // collector's own last market tick — not the bucket-aligned chart series.
+    const rawSignalTsIso = newestTimestamp(
+      asString(latestProbability?.timestamp),
+      asString(sourceSignal.signal_ts),
+    );
+    const rawPriceTsIso = asString(latestMarket?.timestamp);
     return NextResponse.json(
-      withRangeMeta(localPayload, timeAlignedSeries, priceSource),
+      applyRealtimeFreshness(finalPayload, nowMs, baseConnection, rawSignalTsIso, rawPriceTsIso, timeframe),
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch {
@@ -1291,9 +1436,8 @@ export async function GET(req: NextRequest) {
       const stored = await loadStoredTelemetry();
       if (stored) {
         const ageMs = Math.max(0, Date.now() - stored.updatedAt.getTime());
-        const sourceConnection = asString(stored.payload.connection, 'OFFLINE') as ConnectionState;
-        const relayConnection: ConnectionState = ageMs <= ONLINE_AFTER_MS
-          ? sourceConnection
+        const relayConnection: SourceConnectionState = ageMs <= ONLINE_AFTER_MS
+          ? 'ONLINE'
           : ageMs <= STALE_AFTER_MS
             ? 'STALE'
             : 'OFFLINE';
@@ -1320,8 +1464,22 @@ export async function GET(req: NextRequest) {
           : [];
         const relayAligned = alignSeries(relaySignals, relayMidpointReadiness, relayFallback);
         persistLatestBucket(relayAligned.series);
+        const finalRelayPayload = withRangeMeta(relayPayload, relayAligned.series, relayAligned.priceSource);
+        // The relayed payload is the local machine's full /live response at
+        // publish time, so it still carries the raw (non-bucket-aligned)
+        // signal/price timestamps under bot.signal_at and market.latest.timestamp.
+        const relayRawSignalTsIso =
+          asString(asRecord(stored.payload.bot).signal_at) || asString(stored.payload.latest_signal_ts);
+        const relayRawPriceTsIso = asString(asRecord(asRecord(stored.payload.market).latest).timestamp);
         return NextResponse.json(
-          withRangeMeta(relayPayload, relayAligned.series, relayAligned.priceSource),
+          applyRealtimeFreshness(
+            finalRelayPayload,
+            nowMs,
+            relayConnection,
+            relayRawSignalTsIso,
+            relayRawPriceTsIso,
+            timeframe,
+          ),
           { headers: { 'Cache-Control': 'no-store' } },
         );
       }
@@ -1334,23 +1492,34 @@ export async function GET(req: NextRequest) {
     if (publicCandles.length > 0) {
       const offlineAligned = alignSeries([], 0, []);
       persistLatestBucket(offlineAligned.series);
-      return NextResponse.json(
-        withRangeMeta(
-          {
-            generated_at: new Date().toISOString(),
-            connection: 'OFFLINE',
-            message: 'AI 텔레메트리는 비어 있어 공개 가격만 표시합니다.',
-            bot: null,
-            market: { latest: null, points: [] },
-            signal_history: [],
-            safety: {
-              bot_order_execution: 'DISABLED',
-              real_order_sent_by_bot: false,
-              user_must_place_order_manually: true,
-            },
+      const offlinePayload = withRangeMeta(
+        {
+          generated_at: new Date().toISOString(),
+          connection: 'OFFLINE',
+          message: 'AI 텔레메트리는 비어 있어 공개 가격만 표시합니다.',
+          bot: null,
+          market: { latest: null, points: [] },
+          signal_history: [],
+          safety: {
+            bot_order_execution: 'DISABLED',
+            real_order_sent_by_bot: false,
+            user_must_place_order_manually: true,
           },
-          offlineAligned.series,
-          offlineAligned.priceSource,
+        },
+        offlineAligned.series,
+        offlineAligned.priceSource,
+      );
+      // No live telemetry at all: there is no raw signal timestamp, and the
+      // only price data available is the public candle feed (bucket-aligned,
+      // but connection is already forced OFFLINE below regardless).
+      return NextResponse.json(
+        applyRealtimeFreshness(
+          offlinePayload,
+          nowMs,
+          'OFFLINE',
+          '',
+          asString(publicCandles.at(-1)?.ts),
+          timeframe,
         ),
         { headers: { 'Cache-Control': 'no-store' } },
       );
@@ -1359,6 +1528,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         generated_at: new Date().toISOString(),
+        server_now_ts: new Date(nowMs).toISOString(),
         connection: 'OFFLINE',
         timeframe,
         range,
@@ -1368,6 +1538,19 @@ export async function GET(req: NextRequest) {
         market: { latest: null, points: [] },
         signal_history: [],
         time_aligned_series: [],
+        latest_signal_ts: '',
+        latest_price_ts: '',
+        real_signal_age_sec: null,
+        real_price_age_sec: null,
+        signal_stale: true,
+        price_stale: true,
+        live_state: 'BLOCKED_STALE',
+        decision: 'NO_SIGNAL',
+        mobile_order_candidate: 'BLOCKED_STALE',
+        manual_order_disabled: true,
+        dry_run: true,
+        live_trading_enabled: false,
+        real_orders_placed: 0,
         safety: {
           bot_order_execution: 'DISABLED',
           real_order_sent_by_bot: false,

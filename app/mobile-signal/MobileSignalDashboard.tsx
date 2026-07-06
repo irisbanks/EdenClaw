@@ -17,8 +17,9 @@ import styles from './mobile-signal.module.css';
 const POLL_INTERVAL_MS = 5_000;
 const CHART_INITIAL_DIMENSION = { width: 800, height: 300 };
 
-type DisplayStatus = 'READY' | 'WAIT' | 'BLOCKED' | 'NO_SIGNAL';
-type ConnectionState = 'ONLINE' | 'STALE' | 'OFFLINE';
+type DisplayStatus = 'READY' | 'WAIT' | 'BLOCKED' | 'BLOCKED_STALE' | 'NO_SIGNAL';
+type ConnectionState = 'FRESH' | 'DELAYED' | 'STALE' | 'OFFLINE';
+type SourceConnectionState = 'ONLINE' | 'STALE' | 'OFFLINE';
 type SignalTimeframe = '5m' | '15m' | '30m';
 type SignalRange = '1h' | '6h' | '24h' | '7d';
 
@@ -28,8 +29,11 @@ const RANGE_OPTIONS: ReadonlyArray<{ value: SignalRange; label: string; caption:
   { value: '24h', label: '24H', caption: '최근 24시간' },
   { value: '7d', label: '7D', caption: '최근 7일' },
 ];
+const TIMEFRAME_OPTIONS: ReadonlyArray<SignalTimeframe> = ['5m', '15m', '30m'];
 
 const RANGE_STORAGE_KEY = 'eden-mobile-signal-range';
+const MAX_VISIBLE_POINTS = 96;
+const CHART_SYNC_ID = 'eden-mobile-signal-timeline';
 
 interface LatestSignal {
   ticket_status: DisplayStatus;
@@ -166,9 +170,9 @@ interface PriceLevels {
 }
 
 interface BotTelemetry {
-  bridge_connection: ConnectionState;
-  market_connection: ConnectionState;
-  model_connection: ConnectionState;
+  bridge_connection: SourceConnectionState;
+  market_connection: SourceConnectionState;
+  model_connection: SourceConnectionState;
   updated_at: string;
   bridge_name: string;
   mode: string;
@@ -192,7 +196,9 @@ interface BotTelemetry {
 
 interface LiveFeed {
   generated_at: string;
+  server_now_ts?: string;
   connection: ConnectionState;
+  decision?: 'LONG' | 'SHORT' | 'WAIT' | 'NO_SIGNAL';
   timeframe?: SignalTimeframe;
   range?: SignalRange;
   points?: number;
@@ -206,6 +212,18 @@ interface LiveFeed {
   signal_age_sec?: number;
   signal_age_label?: string;
   signal_stale?: boolean;
+  signal_cycle_state?: ConnectionState | 'FRESH_PENDING_CANDLE';
+  signal_fresh_after_sec?: number;
+  signal_stale_after_sec?: number;
+  real_signal_age_sec?: number | null;
+  real_price_age_sec?: number | null;
+  price_stale?: boolean;
+  live_state?: 'ACTIVE' | 'NO_SIGNAL' | 'BLOCKED_STALE';
+  mobile_order_candidate?: 'LONG' | 'SHORT' | 'NO_SIGNAL' | 'BLOCKED_STALE';
+  manual_order_disabled?: boolean;
+  dry_run?: boolean;
+  live_trading_enabled?: boolean;
+  real_orders_placed?: number;
   readiness?: ReadinessSummary;
   bots?: {
     midpoint_0049: CandidateReadiness;
@@ -269,7 +287,10 @@ function normalizeSignal(payload: unknown): LatestSignal {
 function isLiveFeed(payload: unknown): payload is LiveFeed {
   return (
     isRecord(payload) &&
-    (payload.connection === 'ONLINE' || payload.connection === 'STALE' || payload.connection === 'OFFLINE') &&
+    (payload.connection === 'FRESH' ||
+      payload.connection === 'DELAYED' ||
+      payload.connection === 'STALE' ||
+      payload.connection === 'OFFLINE') &&
     isRecord(payload.market) &&
     Array.isArray(payload.market.points) &&
     Array.isArray(payload.signal_history)
@@ -306,9 +327,10 @@ function chartTime(value: string, includeDate = false): string {
 }
 
 function displayConnection(value: ConnectionState): string {
-  if (value === 'ONLINE') return '정상 연결';
-  if (value === 'STALE') return '갱신 지연';
-  return '연결 끊김';
+  if (value === 'FRESH') return '실시간 연결 정상';
+  if (value === 'DELAYED') return '갱신 지연 — 주문 금지';
+  if (value === 'STALE') return '실시간 아님 — 주문 금지';
+  return '연결 끊김 — 주문 금지';
 }
 
 function displayReason(value?: string): string {
@@ -352,6 +374,7 @@ function displayBlocker(value: string): string {
     COOLDOWN_ACTIVE: 'Cooldown 진행 중',
     HC_BELOW_0_85: 'HC 0.85 기준 미달',
     HC_BELOW_0_90: 'HC 0.90 기준 미달',
+    REALTIME_DATA_UNSAFE: '실시간 데이터 지연 또는 연결 끊김',
   };
   return labels[value.replaceAll('.', '_')] ?? value;
 }
@@ -377,7 +400,7 @@ function AiSignalTooltip({
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload;
   if (!point) return null;
-  const noHistory = point.signal_history_available === false || point.decision === 'NO_SIGNAL';
+  const noHistory = point.signal_history_available === false || point.decision === 'NO_SIGNAL_HISTORY';
   return (
     <div className={styles.chartTooltip}>
       <strong>{chartTime(point.ts, true)}</strong>
@@ -430,9 +453,12 @@ export default function MobileSignalDashboard() {
   const [telemetryError, setTelemetryError] = useState('');
   const [loading, setLoading] = useState(true);
   const [chartReady, setChartReady] = useState(false);
-  const [timeframe] = useState<SignalTimeframe>('15m');
+  const [timeframe, setTimeframe] = useState<SignalTimeframe>('15m');
   const [range, setRange] = useState<SignalRange>('24h');
   const [lastCheckedAt, setLastCheckedAt] = useState<Date | null>(null);
+  const [chartWindowStart, setChartWindowStart] = useState(0);
+  const [chartWindowSize, setChartWindowSize] = useState(MAX_VISIBLE_POINTS);
+  const requestTimeframe: SignalTimeframe = range === '7d' ? '15m' : timeframe;
 
   // Restore the last range the user picked (default 24h on first visit).
   useEffect(() => {
@@ -440,6 +466,7 @@ export default function MobileSignalDashboard() {
       const saved = window.localStorage.getItem(RANGE_STORAGE_KEY);
       if (saved === '1h' || saved === '6h' || saved === '24h' || saved === '7d') {
         setRange(saved);
+        if (saved === '7d') setTimeframe('15m');
       }
     } catch {
       // localStorage may be unavailable; keep the 24h default.
@@ -447,12 +474,18 @@ export default function MobileSignalDashboard() {
   }, []);
 
   const selectRange = (next: SignalRange) => {
+    if (next === '7d') setTimeframe('15m');
     setRange(next);
     try {
       window.localStorage.setItem(RANGE_STORAGE_KEY, next);
     } catch {
       // Non-fatal: selection still applies for this session.
     }
+  };
+
+  const selectTimeframe = (next: SignalTimeframe) => {
+    if (range === '7d' && next !== '15m') return;
+    setTimeframe(next);
   };
 
   useEffect(() => {
@@ -478,7 +511,7 @@ export default function MobileSignalDashboard() {
       try {
         const [signalResult, liveResult] = await Promise.allSettled([
           fetchJson('/api/mobile-order-signal/latest'),
-          fetchJson(`/api/mobile-order-signal/live?tf=${timeframe}&range=${range}`),
+          fetchJson(`/api/mobile-order-signal/live?tf=${requestTimeframe}&range=${range}`),
         ]);
 
         if (!active) return;
@@ -515,12 +548,12 @@ export default function MobileSignalDashboard() {
       window.cancelAnimationFrame(chartFrameId);
       window.clearInterval(intervalId);
     };
-  }, [timeframe, range]);
+  }, [requestTimeframe, range]);
 
-  const status = loading ? 'NO_SIGNAL' : signal.ticket_status;
+  const sourceStatus: DisplayStatus = loading ? 'NO_SIGNAL' : signal.ticket_status;
   const bot = liveFeed?.bot;
   const latestMarket = liveFeed?.market.latest;
-  const activeTimeframe = liveFeed?.timeframe ?? timeframe;
+  const activeTimeframe = liveFeed?.timeframe ?? requestTimeframe;
   const activeRange = liveFeed?.range ?? range;
   const rangeCaption = RANGE_OPTIONS.find((option) => option.value === activeRange)?.caption ?? '최근 24시간';
   const bucketMinutes = activeTimeframe === '5m' ? 5 : activeTimeframe === '30m' ? 30 : 15;
@@ -542,19 +575,68 @@ export default function MobileSignalDashboard() {
     wait_marker_price: point.signal_changed && point.status === 'WAIT' ? point.price : null,
     blocked_marker_price: point.signal_changed && point.status === 'BLOCKED' ? point.price : null,
   }));
-  // The API already returns exactly the requested range window; cap only as a
-  // recharts safety bound for the 7d (672 point) view.
-  const visibleSeries = alignedChart.slice(-700);
+  const effectiveWindowSize = Math.max(1, Math.min(chartWindowSize, alignedChart.length || 1));
+  const maxWindowStart = Math.max(0, alignedChart.length - effectiveWindowSize);
+  const selectedStartIndex = Math.min(Math.max(0, chartWindowStart), maxWindowStart);
+  const selectedEndIndex = Math.min(
+    alignedChart.length - 1,
+    selectedStartIndex + effectiveWindowSize - 1,
+  );
+  const visibleSeries = selectedEndIndex >= selectedStartIndex
+    ? alignedChart.slice(selectedStartIndex, selectedEndIndex + 1)
+    : [];
   const xMin = visibleSeries[0]?.x;
   const xMax = visibleSeries.at(-1)?.x;
   const sharedXDomain: [number, number] = [xMin ?? 0, xMax ?? 0];
   const latestSignalX = new Date(liveFeed?.latest_signal_ts ?? '').getTime();
   const readiness = liveFeed?.readiness;
-  const candidates = liveFeed?.bots
+  const rawCandidates = liveFeed?.bots
     ? [liveFeed.bots.midpoint_0049, liveFeed.bots.v3_hc090, liveFeed.bots.v3_hc085]
     : [];
   const blockers = liveFeed?.blocker_breakdown ?? [];
   const priceLevels = liveFeed?.price_levels;
+  const isRealtimeUnsafe = Boolean(
+    telemetryError ||
+      !liveFeed ||
+      liveFeed.connection !== 'FRESH' ||
+      liveFeed.signal_stale === true ||
+      liveFeed.price_stale === true,
+  );
+  const status: DisplayStatus = isRealtimeUnsafe
+    ? liveFeed ? 'BLOCKED_STALE' : 'NO_SIGNAL'
+    : sourceStatus;
+  const candidates = rawCandidates.map((candidate) => isRealtimeUnsafe
+    ? {
+        ...candidate,
+        status: 'STALE' as const,
+        blocked_reasons: Array.from(new Set([...candidate.blocked_reasons, 'REALTIME_DATA_UNSAFE'])),
+      }
+    : candidate);
+  const displayedStart = visibleSeries[0]?.ts;
+  const displayedEnd = visibleSeries.at(-1)?.ts;
+  const canMovePrevious = selectedStartIndex > 0;
+  const canMoveNext = selectedEndIndex < alignedChart.length - 1;
+
+  useEffect(() => {
+    const total = alignedChart.length;
+    const windowSize = activeRange === '7d'
+      ? Math.min(total, MAX_VISIBLE_POINTS)
+      : total;
+    setChartWindowSize(Math.max(1, windowSize));
+    setChartWindowStart(Math.max(0, total - windowSize));
+  }, [activeRange, alignedChart.length]);
+
+  const moveViewWindow = (direction: -1 | 1) => {
+    if (alignedChart.length === 0) return;
+    const step = activeRange === '7d' ? MAX_VISIBLE_POINTS : effectiveWindowSize;
+    const nextStart = Math.max(
+      0,
+      Math.min(selectedStartIndex + direction * step, maxWindowStart),
+    );
+    setChartWindowStart(nextStart);
+  };
+
+  const moveViewWindowToLatest = () => setChartWindowStart(maxWindowStart);
   const currentPrice = firstFinite(latestMarket?.mid, priceLevels?.current);
   const entryPrice = firstFinite(signal.suggested_limit_price, priceLevels?.entry);
   const takeProfitPrice = firstFinite(signal.take_profit_price, priceLevels?.take_profit);
@@ -571,11 +653,23 @@ export default function MobileSignalDashboard() {
           표시 전용 — 봇은 주문하지 않음
         </div>
 
+        {isRealtimeUnsafe ? (
+          <div className={styles.staleBanner} role="alert" aria-live="assertive">
+            {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
+            <span className={styles.staleBannerDetail}>
+              signal age {displayAge(liveFeed?.real_signal_age_sec ?? undefined)} · price age{' '}
+              {displayAge(liveFeed?.real_price_age_sec ?? undefined)} · server now{' '}
+              {displayTime(liveFeed?.server_now_ts)}
+            </span>
+          </div>
+        ) : null}
+
         <div className={styles.viewStatusBar} role="status">
           <span><strong>{bucketMinutes}분 단위</strong> / {rangeCaption}</span>
-          <span>가격과 AI 시그널 같은 timestamp 기준</span>
-          <span className={liveFeed?.signal_stale ? styles.viewStatusStale : styles.viewStatusFresh}>
-            {liveFeed?.signal_stale ? 'AI signal STALE — 주문 금지' : 'AI signal FRESH'}
+          <span>표시 구간: <strong>{displayTime(displayedStart)} ~ {displayTime(displayedEnd)}</strong></span>
+          <span>총 데이터: <strong>{alignedChart.length}개</strong> / 현재 표시: <strong>{visibleSeries.length}개</strong></span>
+          <span className={isRealtimeUnsafe ? styles.viewStatusStale : styles.viewStatusFresh}>
+            {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
           </span>
         </div>
 
@@ -607,36 +701,82 @@ export default function MobileSignalDashboard() {
                   {bucketMinutes}분 단위 / {rangeCaption} — 가격과 AI 시그널 같은 timestamp 기준
                 </p>
               </div>
-              <div className={styles.rangeButtons} aria-label="과거 조회 기간 선택">
-                {RANGE_OPTIONS.map((option) => (
-                  <button
-                    type="button"
-                    key={option.value}
-                    className={activeRange === option.value ? styles.activeRange : undefined}
-                    aria-pressed={activeRange === option.value}
-                    onClick={() => selectRange(option.value)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+              <div className={styles.timelineControls}>
+                <div className={styles.timeframeButtons} aria-label="시간 단위 선택">
+                  {TIMEFRAME_OPTIONS.map((option) => (
+                    <button
+                      type="button"
+                      key={option}
+                      className={activeTimeframe === option ? styles.activeTimeframe : undefined}
+                      aria-pressed={activeTimeframe === option}
+                      disabled={range === '7d' && option !== '15m'}
+                      onClick={() => selectTimeframe(option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.rangeButtons} aria-label="과거 조회 기간 선택">
+                  {RANGE_OPTIONS.map((option) => (
+                    <button
+                      type="button"
+                      key={option.value}
+                      className={activeRange === option.value ? styles.activeRange : undefined}
+                      aria-pressed={activeRange === option.value}
+                      onClick={() => selectRange(option.value)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
+
+            {activeRange === '7d' ? (
+              <p className={styles.fixedTimeframeNotice}>7D 과거 보기는 15분 단위로 표시됩니다.</p>
+            ) : null}
 
             <dl className={styles.syncMetricGrid}>
               <div><dt>선택 시간봉</dt><dd>{activeTimeframe}</dd></div>
               <div><dt>조회 기간</dt><dd>{rangeCaption}</dd></div>
-              <div><dt>현재 결정</dt><dd>{bot?.current_signal ?? '—'}</dd></div>
-              <div><dt>가격 최신 {bucketMinutes}m bucket</dt><dd>{displayTime(liveFeed?.latest_price_ts)}</dd></div>
+              <div><dt>현재 AI 결정</dt><dd>{liveFeed?.decision ?? bot?.current_signal ?? '—'}</dd></div>
+              <div><dt>모바일 주문 후보</dt><dd>{liveFeed?.mobile_order_candidate ?? status}</dd></div>
+              <div><dt>최신 실시간 가격</dt><dd>{displayTime(liveFeed?.latest_price_ts)}</dd></div>
               <div><dt>AI signal 시간</dt><dd>{displayTime(liveFeed?.latest_signal_ts)}</dd></div>
               <div><dt>시그널 지연</dt><dd>{liveFeed?.signal_age_label ?? displayAge(liveFeed?.signal_age_sec)}</dd></div>
-              <div><dt>signal stale</dt><dd>{liveFeed?.signal_stale ? 'true' : 'false'}</dd></div>
-              <div><dt>표시 캔들</dt><dd>{visibleSeries.length} / {liveFeed?.requested_points ?? '—'}개</dd></div>
+              <div><dt>signal stale (실시간 기준)</dt><dd>{liveFeed?.signal_stale ? 'true' : 'false'}</dd></div>
+              <div><dt>price stale (실시간 기준)</dt><dd>{liveFeed?.price_stale ? 'true' : 'false'}</dd></div>
+              <div><dt>real signal age</dt><dd>{displayAge(liveFeed?.real_signal_age_sec ?? undefined)}</dd></div>
+              <div><dt>real price age</dt><dd>{displayAge(liveFeed?.real_price_age_sec ?? undefined)}</dd></div>
+              <div><dt>signal fresh / stale 기준</dt><dd>{displayAge(liveFeed?.signal_fresh_after_sec)} / {displayAge(liveFeed?.signal_stale_after_sec)}</dd></div>
+              <div><dt>server now</dt><dd>{displayTime(liveFeed?.server_now_ts)}</dd></div>
+              <div><dt>총 / 현재 표시</dt><dd>{alignedChart.length} / {visibleSeries.length}개</dd></div>
             </dl>
 
-            <div className={`${styles.syncVerdict} ${liveFeed?.signal_stale ? styles.syncStale : styles.syncFresh}`} role="status">
-              {liveFeed?.signal_stale
-                ? `AI 시그널 지연 — 주문 금지 · ${bucketMinutes}분 보기에서 ${displayAge(liveFeed?.signal_age_sec)} 경과 (확률선 회색 점선)`
-                : `AI 시그널 FRESH — 같은 ${bucketMinutes}분 timestamp 기준 as-of join 완료`}
+            <div className={`${styles.syncVerdict} ${isRealtimeUnsafe ? styles.syncStale : styles.syncFresh}`} role="status">
+              {isRealtimeUnsafe
+                ? `${displayConnection(liveFeed?.connection ?? 'OFFLINE')} · 실시간 signal age ${displayAge(liveFeed?.real_signal_age_sec ?? undefined)}`
+                : liveFeed?.signal_cycle_state === 'FRESH_PENDING_CANDLE'
+                  ? `실시간 연결 정상 · 다음 ${bucketMinutes}분봉 확정 대기`
+                  : `실시간 연결 정상 · 같은 ${bucketMinutes}분 timestamp 기준 as-of join 완료`}
+            </div>
+
+            <div className={styles.historyNavigator} aria-label="가격 및 AI 차트 공통 표시 구간 이동">
+              <div className={styles.navigatorActions}>
+                <button type="button" disabled={!canMovePrevious} onClick={() => moveViewWindow(-1)}>
+                  ◀ 이전 24H
+                </button>
+                <button type="button" disabled={!canMoveNext} onClick={moveViewWindowToLatest}>
+                  최신
+                </button>
+                <button type="button" disabled={!canMoveNext} onClick={() => moveViewWindow(1)}>
+                  다음 24H ▶
+                </button>
+              </div>
+              <span>
+                표시 구간 {displayTime(displayedStart)} ~ {displayTime(displayedEnd)}
+                <small>가격·AI 차트에 동일한 96개 구간 적용</small>
+              </span>
             </div>
 
             {!signalHistoryAvailable || signalHistoryNote ? (
@@ -680,10 +820,10 @@ export default function MobileSignalDashboard() {
               <PercentBar label="HC085 readiness" pct={readiness?.hc085_ready_pct ?? 0} detail={readiness ? `${readiness.hc_current.toFixed(4)} / 0.85` : '—'} />
               <PercentBar label="HC090 readiness" pct={readiness?.hc090_ready_pct ?? 0} detail={readiness ? `${readiness.hc_current.toFixed(4)} / 0.90` : '—'} />
             </div>
-            <div className={`${styles.alignmentMeta} ${readiness?.signal_stale ? styles.staleSignal : styles.freshSignal}`}>
-              <span>마지막 AI signal <strong>{displayTime(readiness?.signal_timestamp)}</strong></span>
-              <span>Signal age <strong>{displayAge(readiness?.signal_age_seconds)}</strong></span>
-              <span>{readiness?.signal_stale ? 'STALE · 회색 점선 표시' : 'FRESH · 가격 tick과 정렬됨'}</span>
+            <div className={`${styles.alignmentMeta} ${isRealtimeUnsafe ? styles.staleSignal : styles.freshSignal}`}>
+              <span>마지막 AI signal <strong>{displayTime(liveFeed?.latest_signal_ts)}</strong></span>
+              <span>실시간 Signal age <strong>{displayAge(liveFeed?.real_signal_age_sec ?? undefined)}</strong></span>
+              <span>{displayConnection(liveFeed?.connection ?? 'OFFLINE')}</span>
             </div>
           </section>
 
@@ -802,7 +942,11 @@ export default function MobileSignalDashboard() {
                   minHeight={0}
                   initialDimension={CHART_INITIAL_DIMENSION}
                 >
-                  <LineChart data={visibleSeries} margin={{ top: 12, right: 12, bottom: 2, left: 4 }}>
+                  <LineChart
+                    data={visibleSeries}
+                    margin={{ top: 12, right: 12, bottom: 2, left: 4 }}
+                    syncId={CHART_SYNC_ID}
+                  >
                     <CartesianGrid stroke="rgba(148, 163, 184, 0.13)" strokeDasharray="4 4" vertical={false} />
                     <XAxis
                       dataKey="x"
@@ -912,7 +1056,11 @@ export default function MobileSignalDashboard() {
                   minHeight={0}
                   initialDimension={CHART_INITIAL_DIMENSION}
                 >
-                  <LineChart data={visibleSeries} margin={{ top: 12, right: 12, bottom: 2, left: 4 }}>
+                  <LineChart
+                    data={visibleSeries}
+                    margin={{ top: 12, right: 12, bottom: 2, left: 4 }}
+                    syncId={CHART_SYNC_ID}
+                  >
                     <CartesianGrid stroke="rgba(148, 163, 184, 0.13)" strokeDasharray="4 4" vertical={false} />
                     <XAxis
                       dataKey="x"
@@ -954,7 +1102,7 @@ export default function MobileSignalDashboard() {
           </div>
 
           <p className={styles.feedNote}>
-            화면은 5초마다 확인하며 공개 시세 수집기는 약 20~30초마다 갱신됩니다. 마지막 AI signal: {displayTime(readiness?.signal_timestamp ?? bot?.signal_at)} · age {displayAge(readiness?.signal_age_seconds)}
+            화면은 5초마다 확인합니다. 마지막 AI signal: {displayTime(liveFeed?.latest_signal_ts)} · 실시간 age {displayAge(liveFeed?.real_signal_age_sec ?? undefined)} · 주문 후보 {liveFeed?.mobile_order_candidate ?? status}
           </p>
         </section>
 
@@ -979,7 +1127,7 @@ export default function MobileSignalDashboard() {
             </div>
           ) : null}
 
-          {status === 'WAIT' || status === 'BLOCKED' || status === 'NO_SIGNAL' ? (
+          {status === 'WAIT' || status === 'BLOCKED' || status === 'BLOCKED_STALE' || status === 'NO_SIGNAL' ? (
             <div className={styles.orderProhibited} role="alert">
               주문 금지
             </div>

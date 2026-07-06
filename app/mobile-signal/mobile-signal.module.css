@@ -38,6 +38,33 @@
   font-weight: 800;
 }
 
+.staleBanner {
+  margin-top: 14px;
+  padding: 16px 20px;
+  border: 2px solid rgba(248, 113, 113, 0.75);
+  border-radius: 12px;
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  animation: staleBannerPulse 1.6s ease-in-out infinite;
+}
+
+.staleBannerDetail {
+  display: block;
+  margin-top: 4px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: #fca5a5;
+  letter-spacing: normal;
+}
+
+@keyframes staleBannerPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+  50% { box-shadow: 0 0 22px rgba(248, 113, 113, 0.45); }
+}
+
 .manualNotice {
   margin: 14px 2px 28px;
   color: #a7f3d0;
@@ -78,21 +105,32 @@
   font: 750 0.76rem/1 var(--font-geist-mono), monospace;
 }
 
-.connectionBadge.online {
+.connectionBadge.fresh {
   border-color: rgba(74, 222, 128, 0.35);
   background: rgba(34, 197, 94, 0.12);
   color: #86efac;
 }
 
-.connectionBadge.stale {
+.connectionBadge.delayed {
   border-color: rgba(250, 204, 21, 0.35);
   background: rgba(250, 204, 21, 0.12);
   color: #fde047;
 }
 
-.connectionBadge.stale .liveDot {
+.connectionBadge.delayed .liveDot {
   background: #facc15;
   box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.12);
+}
+
+.connectionBadge.stale {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(185, 28, 28, 0.2);
+  color: #fecaca;
+}
+
+.connectionBadge.stale .liveDot {
+  background: #f87171;
+  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.14);
 }
 
 .connectionBadge.offline {
@@ -129,6 +167,12 @@
   gap: 6px;
 }
 
+.timelineControls {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
 .timeframeButtons button {
   min-width: 48px;
   padding: 8px 10px;
@@ -152,6 +196,18 @@
   background: rgba(14, 165, 233, 0.18);
   color: #bae6fd;
   box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.08);
+}
+
+.timeframeButtons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.32;
+}
+
+.fixedTimeframeNotice {
+  margin: -4px 0 14px;
+  color: #7dd3fc;
+  font-size: 0.74rem;
+  font-weight: 700;
 }
 
 /* Historical range selector (1H / 6H / 24H / 7D) */
@@ -221,6 +277,48 @@
   color: #fde68a;
   font-size: 0.74rem;
   line-height: 1.5;
+}
+
+.historyNavigator {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.navigatorActions {
+  display: flex;
+  gap: 7px;
+}
+
+.navigatorActions button {
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 9px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #bae6fd;
+  cursor: pointer;
+  font: 750 0.72rem/1 var(--font-geist-mono), monospace;
+}
+
+.navigatorActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.historyNavigator span {
+  min-width: 0;
+  color: #e2e8f0;
+  font: 650 0.72rem/1.5 var(--font-geist-mono), monospace;
+  text-align: center;
+}
+
+.historyNavigator small {
+  display: block;
+  color: #64748b;
+  font-size: 0.66rem;
 }
 
 .chartTooltip {
@@ -757,6 +855,7 @@
 .ready { background: #22c55e; color: #052e16; }
 .wait { background: #facc15; color: #422006; }
 .blocked { background: #fb7185; color: #4c0519; }
+.blocked_stale { background: #ef4444; color: #fff1f2; }
 .no_signal { background: #334155; color: #e2e8f0; }
 
 .polling {
@@ -925,8 +1024,12 @@
   .sectionHeading > span { text-align: left; }
   .timeframeButtons { width: 100%; }
   .timeframeButtons button { flex: 1; }
+  .timelineControls { width: 100%; justify-items: stretch; }
   .rangeButtons { width: 100%; }
   .rangeButtons button { flex: 1; }
+  .historyNavigator { grid-template-columns: 1fr; }
+  .navigatorActions { order: 2; }
+  .navigatorActions button { flex: 1; padding-inline: 8px; }
   .syncMetricGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .overallReadiness { grid-template-columns: 1fr; }
   .overallScore { min-height: 92px; }
