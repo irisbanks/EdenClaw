@@ -334,6 +334,96 @@ function realtimeSignalThresholds(timeframe: Timeframe): { fresh: number; stale:
   return { fresh: 1080, stale: 2100 };
 }
 
+function normalizeProbabilityPercents(
+  longPct: number,
+  shortPct: number,
+  waitPct: number,
+): { longPct: number; shortPct: number; waitPct: number } {
+  const values = [clampPercent(longPct), clampPercent(shortPct), clampPercent(waitPct)];
+  const total = values.reduce((sum, value) => sum + value, 0);
+  if (total <= 0) return { longPct: 0, shortPct: 0, waitPct: 100 };
+  const normalizedLong = roundPercent((values[0] / total) * 100);
+  const normalizedShort = roundPercent((values[1] / total) * 100);
+  return {
+    longPct: normalizedLong,
+    shortPct: normalizedShort,
+    waitPct: roundPercent(100 - normalizedLong - normalizedShort),
+  };
+}
+
+function buildLivePreviewSignal(
+  payload: JsonRecord,
+  latestPriceTs: string,
+  realPriceAgeSec: number | null,
+): JsonRecord {
+  const series = Array.isArray(payload.time_aligned_series)
+    ? payload.time_aligned_series.filter(isRecord)
+    : [];
+  const recent = series.slice(-8);
+  const latestPoint = recent.at(-1) ?? {};
+  const marketLatest = asRecord(asRecord(payload.market).latest);
+  const currentPrice = asNumber(
+    payload.current_price,
+    asNumber(marketLatest.mid, asNumber(latestPoint.price, Number.NaN)),
+  );
+  const currentOpen = asNumber(latestPoint.open, asNumber(latestPoint.price, Number.NaN));
+  const firstPrice = asNumber(recent[0]?.close, asNumber(recent[0]?.price, Number.NaN));
+  const hasPrice = Number.isFinite(currentPrice) && currentPrice > 0;
+  const intrabarReturnPct = hasPrice && Number.isFinite(currentOpen) && currentOpen > 0
+    ? ((currentPrice - currentOpen) / currentOpen) * 100
+    : 0;
+  const slopeReturnPct = hasPrice && Number.isFinite(firstPrice) && firstPrice > 0
+    ? ((currentPrice - firstPrice) / firstPrice) * 100
+    : 0;
+  // A deliberately small heuristic tilt around the confirmed model baseline.
+  // This is market-momentum context, not a new model inference.
+  const momentumAdjustment = Math.max(
+    -12,
+    Math.min(12, intrabarReturnPct * 10 + slopeReturnPct * 4),
+  );
+  const baseline = normalizeProbabilityPercents(
+    asNumber(payload.long_probability_pct),
+    asNumber(payload.short_probability_pct),
+    asNumber(payload.wait_probability_pct),
+  );
+  const preview = normalizeProbabilityPercents(
+    baseline.longPct + Math.max(0, momentumAdjustment),
+    baseline.shortPct + Math.max(0, -momentumAdjustment),
+    Math.max(0, baseline.waitPct - Math.abs(momentumAdjustment) * 0.35),
+  );
+  const decision = !hasPrice || !latestPriceTs
+    ? 'NO_SIGNAL'
+    : preview.longPct >= 40 && preview.longPct > preview.shortPct && preview.longPct > preview.waitPct
+      ? 'LONG'
+      : preview.shortPct >= 40 && preview.shortPct > preview.longPct && preview.shortPct > preview.waitPct
+        ? 'SHORT'
+        : 'WAIT';
+
+  return {
+    ts: latestPriceTs,
+    age_sec: realPriceAgeSec,
+    decision,
+    confidence_pct: decision === 'LONG'
+      ? preview.longPct
+      : decision === 'SHORT'
+        ? preview.shortPct
+        : preview.waitPct,
+    long_pct: preview.longPct,
+    short_pct: preview.shortPct,
+    wait_pct: preview.waitPct,
+    source: 'LIVE_PRICE_PREVIEW',
+    status: realPriceAgeSec === null
+      ? 'OFFLINE'
+      : realPriceAgeSec > REALTIME_PRICE_STALE_AFTER_SEC
+        ? 'STALE'
+        : 'FRESH',
+    is_trade_eligible: false,
+    intrabar_return_pct: Math.round(intrabarReturnPct * 10_000) / 10_000,
+    recent_slope_pct: Math.round(slopeReturnPct * 10_000) / 10_000,
+    note: '진행 중인 봉 기준 예비 신호이며 주문에 사용하지 않음',
+  };
+}
+
 type LiveState = 'ACTIVE' | 'NO_SIGNAL' | 'BLOCKED_STALE';
 
 // Overlays real-time freshness on top of an already-built response payload.
@@ -369,20 +459,49 @@ function applyRealtimeFreshness(
   const decision = normalizeDecision(payload.decision);
   const unsafe = connection !== 'FRESH' || signalStale || priceStale;
   const sourceBot = asRecord(payload.bot);
+  const overallReadinessPct = asNumber(
+    payload.overall_trade_readiness_pct,
+    asNumber(asRecord(payload.readiness).overall_trade_readiness_pct),
+  );
+  const confirmedConditionsMet =
+    (decision === 'LONG' || decision === 'SHORT') && overallReadinessPct > 0;
   // NO_SIGNAL (live data alive, no trade candidate) vs STALE (data itself old)
   // are deliberately distinct states — a quiet market must never be reported
   // the same way as a dead bridge/collector.
   const liveState: LiveState =
     unsafe
       ? 'BLOCKED_STALE'
-      : decision === 'LONG' || decision === 'SHORT'
+      : confirmedConditionsMet
         ? 'ACTIVE'
         : 'NO_SIGNAL';
   const mobileOrderCandidate = unsafe
     ? 'BLOCKED_STALE'
-    : decision === 'LONG' || decision === 'SHORT'
+    : confirmedConditionsMet
       ? decision
       : 'NO_SIGNAL';
+  const confirmedSignalState = realSignalAgeSec === null
+    ? 'OFFLINE'
+    : realSignalAgeSec > signalThresholds.stale
+      ? 'STALE'
+      : realSignalAgeSec > signalThresholds.fresh
+        ? 'DELAYED'
+        : timeframe === '15m'
+          ? 'FRESH_PENDING_CANDLE'
+          : 'FRESH';
+  const confirmedSignal = {
+    ts: latestSignalTs,
+    age_sec: realSignalAgeSec,
+    decision,
+    hc: asNumber(payload.hc, asNumber(sourceBot.current_hc)),
+    long_pct: asNumber(payload.long_probability_pct),
+    short_pct: asNumber(payload.short_probability_pct),
+    wait_pct: asNumber(payload.wait_probability_pct),
+    source: 'CONFIRMED_15M_AI',
+    status: confirmedSignalState,
+    candidate_conditions_met: confirmedConditionsMet,
+    is_trade_eligible: false,
+  };
+  const livePreviewSignal = buildLivePreviewSignal(payload, latestPriceTs, realPriceAgeSec);
 
   return {
     ...payload,
@@ -403,6 +522,8 @@ function applyRealtimeFreshness(
         : connection,
     signal_fresh_after_sec: signalThresholds.fresh,
     signal_stale_after_sec: signalThresholds.stale,
+    confirmed_signal: confirmedSignal,
+    live_preview_signal: livePreviewSignal,
     decision,
     mobile_order_candidate: mobileOrderCandidate,
     manual_order_disabled: true,
@@ -1551,6 +1672,32 @@ export async function GET(req: NextRequest) {
         dry_run: true,
         live_trading_enabled: false,
         real_orders_placed: 0,
+        confirmed_signal: {
+          ts: '',
+          age_sec: null,
+          decision: 'NO_SIGNAL',
+          hc: 0,
+          long_pct: 0,
+          short_pct: 0,
+          wait_pct: 0,
+          source: 'CONFIRMED_15M_AI',
+          status: 'OFFLINE',
+          candidate_conditions_met: false,
+          is_trade_eligible: false,
+        },
+        live_preview_signal: {
+          ts: '',
+          age_sec: null,
+          decision: 'NO_SIGNAL',
+          confidence_pct: 0,
+          long_pct: 0,
+          short_pct: 0,
+          wait_pct: 0,
+          source: 'LIVE_PRICE_PREVIEW',
+          status: 'OFFLINE',
+          is_trade_eligible: false,
+          note: '진행 중인 봉 기준 예비 신호이며 주문에 사용하지 않음',
+        },
         safety: {
           bot_order_execution: 'DISABLED',
           real_order_sent_by_bot: false,

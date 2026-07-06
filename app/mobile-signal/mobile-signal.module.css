@@ -348,6 +348,104 @@
   font-weight: 800;
 }
 
+.tooltipPreview {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(34, 211, 238, 0.28);
+  color: #a5f3fc;
+}
+
+.signalComparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.confirmedSignalCard,
+.previewSignalCard {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.confirmedSignalCard {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.previewSignalCard {
+  border-color: rgba(34, 211, 238, 0.38);
+  background: rgba(8, 51, 68, 0.25);
+}
+
+.confirmedSignalCard header,
+.previewSignalCard header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.confirmedSignalCard h4,
+.previewSignalCard h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 0.9rem;
+}
+
+.confirmedSignalCard header > strong {
+  color: #c4b5fd;
+}
+
+.previewSignalCard header > strong {
+  color: #67e8f9;
+}
+
+.confirmedSignalCard p,
+.previewSignalCard p {
+  margin: 12px 0 8px;
+  color: #cbd5e1;
+  font: 650 0.7rem/1.45 var(--font-geist-mono), monospace;
+}
+
+.confirmedSignalCard small,
+.previewSignalCard small {
+  display: block;
+  margin-top: 10px;
+  color: #94a3b8;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.signalProbabilityRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.signalProbabilityRow span {
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+  font: 650 0.65rem/1 var(--font-geist-mono), monospace;
+}
+
+.previewSafetyNotice {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: 9px;
+  background: rgba(250, 204, 21, 0.07);
+  color: #fde68a;
+  font-size: 0.73rem;
+  font-weight: 750;
+}
+
 .syncMetricGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1031,6 +1129,7 @@
   .navigatorActions { order: 2; }
   .navigatorActions button { flex: 1; padding-inline: 8px; }
   .syncMetricGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .signalComparison { grid-template-columns: 1fr; }
   .overallReadiness { grid-template-columns: 1fr; }
   .overallScore { min-height: 92px; }
   .readinessGrid,

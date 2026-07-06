@@ -126,6 +126,36 @@ interface TimeAlignedPoint {
   stale: boolean;
 }
 
+interface ConfirmedSignal {
+  ts: string;
+  age_sec: number | null;
+  decision: 'LONG' | 'SHORT' | 'WAIT' | 'NO_SIGNAL';
+  hc: number;
+  long_pct: number;
+  short_pct: number;
+  wait_pct: number;
+  source: 'CONFIRMED_15M_AI';
+  status: ConnectionState | 'FRESH_PENDING_CANDLE';
+  candidate_conditions_met?: boolean;
+  is_trade_eligible: false;
+}
+
+interface LivePreviewSignal {
+  ts: string;
+  age_sec: number | null;
+  decision: 'LONG' | 'SHORT' | 'WAIT' | 'NO_SIGNAL';
+  confidence_pct: number;
+  long_pct: number;
+  short_pct: number;
+  wait_pct: number;
+  source: 'LIVE_PRICE_PREVIEW';
+  status: 'FRESH' | 'STALE' | 'OFFLINE';
+  is_trade_eligible: false;
+  intrabar_return_pct?: number;
+  recent_slope_pct?: number;
+  note: string;
+}
+
 interface CandidateCondition {
   key: string;
   label: string;
@@ -197,6 +227,7 @@ interface BotTelemetry {
 interface LiveFeed {
   generated_at: string;
   server_now_ts?: string;
+  current_price?: number;
   connection: ConnectionState;
   decision?: 'LONG' | 'SHORT' | 'WAIT' | 'NO_SIGNAL';
   timeframe?: SignalTimeframe;
@@ -224,6 +255,8 @@ interface LiveFeed {
   dry_run?: boolean;
   live_trading_enabled?: boolean;
   real_orders_placed?: number;
+  confirmed_signal?: ConfirmedSignal;
+  live_preview_signal?: LivePreviewSignal;
   readiness?: ReadinessSummary;
   bots?: {
     midpoint_0049: CandidateReadiness;
@@ -386,6 +419,11 @@ function firstFinite(...values: Array<number | null | undefined>): number | null
 interface ChartPoint extends TimeAlignedPoint {
   x: number;
   time: string;
+  preview_decision?: LivePreviewSignal['decision'];
+  preview_confidence_pct?: number;
+  preview_long_pct?: number;
+  preview_short_pct?: number;
+  preview_wait_pct?: number;
 }
 
 // Rich tooltip for the AI probability chart: time, price, HC, LONG/SHORT/WAIT,
@@ -418,6 +456,14 @@ function AiSignalTooltip({
           <span className={point.signal_stale ? styles.tooltipStale : styles.tooltipFresh}>
             {point.signal_stale ? 'STALE · 주문 금지' : 'FRESH'}
           </span>
+          {point.preview_decision ? (
+            <div className={styles.tooltipPreview}>
+              <strong>LIVE PREVIEW · 참고용</strong>
+              <span>{point.preview_decision} · confidence {safePercent(point.preview_confidence_pct).toFixed(1)}%</span>
+              <span>LONG {safePercent(point.preview_long_pct).toFixed(1)}% · SHORT {safePercent(point.preview_short_pct).toFixed(1)}%</span>
+              <span>WAIT {safePercent(point.preview_wait_pct).toFixed(1)}% · 주문 불가</span>
+            </div>
+          ) : null}
         </>
       )}
     </div>
@@ -559,7 +605,10 @@ export default function MobileSignalDashboard() {
   const bucketMinutes = activeTimeframe === '5m' ? 5 : activeTimeframe === '30m' ? 30 : 15;
   const signalHistoryAvailable = liveFeed?.signal_history_available !== false;
   const signalHistoryNote = liveFeed?.signal_history_note ?? '';
-  const alignedChart = (liveFeed?.time_aligned_series ?? []).map((point) => ({
+  const confirmedSignal = liveFeed?.confirmed_signal;
+  const previewSignal = liveFeed?.live_preview_signal;
+  const alignedSource = liveFeed?.time_aligned_series ?? [];
+  const alignedChart = alignedSource.map((point, index) => ({
     ...point,
     x: new Date(point.ts).getTime(),
     time: chartTime(point.ts, true),
@@ -574,6 +623,14 @@ export default function MobileSignalDashboard() {
     ready_marker_price: point.signal_changed && point.status === 'READY' ? point.price : null,
     wait_marker_price: point.signal_changed && point.status === 'WAIT' ? point.price : null,
     blocked_marker_price: point.signal_changed && point.status === 'BLOCKED' ? point.price : null,
+    preview_marker_price: index === alignedSource.length - 1
+      ? liveFeed?.current_price ?? point.price
+      : null,
+    preview_decision: index === alignedSource.length - 1 ? previewSignal?.decision : undefined,
+    preview_confidence_pct: index === alignedSource.length - 1 ? previewSignal?.confidence_pct : undefined,
+    preview_long_pct: index === alignedSource.length - 1 ? previewSignal?.long_pct : undefined,
+    preview_short_pct: index === alignedSource.length - 1 ? previewSignal?.short_pct : undefined,
+    preview_wait_pct: index === alignedSource.length - 1 ? previewSignal?.wait_pct : undefined,
   }));
   const effectiveWindowSize = Math.max(1, Math.min(chartWindowSize, alignedChart.length || 1));
   const maxWindowStart = Math.max(0, alignedChart.length - effectiveWindowSize);
@@ -604,7 +661,11 @@ export default function MobileSignalDashboard() {
   );
   const status: DisplayStatus = isRealtimeUnsafe
     ? liveFeed ? 'BLOCKED_STALE' : 'NO_SIGNAL'
-    : sourceStatus;
+    : liveFeed?.mobile_order_candidate === 'LONG' || liveFeed?.mobile_order_candidate === 'SHORT'
+      ? sourceStatus
+      : sourceStatus === 'READY'
+        ? 'NO_SIGNAL'
+        : sourceStatus;
   const candidates = rawCandidates.map((candidate) => isRealtimeUnsafe
     ? {
         ...candidate,
@@ -759,6 +820,50 @@ export default function MobileSignalDashboard() {
                 : liveFeed?.signal_cycle_state === 'FRESH_PENDING_CANDLE'
                   ? `실시간 연결 정상 · 다음 ${bucketMinutes}분봉 확정 대기`
                   : `실시간 연결 정상 · 같은 ${bucketMinutes}분 timestamp 기준 as-of join 완료`}
+            </div>
+
+            <div className={styles.signalComparison} aria-label="확정 AI 신호와 실시간 예비 신호 비교">
+              <article className={styles.confirmedSignalCard}>
+                <header>
+                  <div>
+                    <span className={styles.label}>CONFIRMED 15M AI</span>
+                    <h4>확정 AI 신호</h4>
+                  </div>
+                  <strong>{confirmedSignal?.decision ?? 'NO_SIGNAL'}</strong>
+                </header>
+                <p>{displayTime(confirmedSignal?.ts)} · age {displayAge(confirmedSignal?.age_sec ?? undefined)}</p>
+                <div className={styles.signalProbabilityRow}>
+                  <span>LONG {safePercent(confirmedSignal?.long_pct).toFixed(1)}%</span>
+                  <span>SHORT {safePercent(confirmedSignal?.short_pct).toFixed(1)}%</span>
+                  <span>WAIT {safePercent(confirmedSignal?.wait_pct).toFixed(1)}%</span>
+                  <span>HC {Number(confirmedSignal?.hc ?? 0).toFixed(4)}</span>
+                </div>
+                <small>{confirmedSignal?.status ?? 'OFFLINE'} · 확정 신호만 후보 조건 판정에 사용</small>
+              </article>
+
+              <article className={styles.previewSignalCard}>
+                <header>
+                  <div>
+                    <span className={styles.label}>LIVE PRICE PREVIEW</span>
+                    <h4>실시간 예비 신호</h4>
+                  </div>
+                  <strong>{previewSignal?.decision ?? 'NO_SIGNAL'}</strong>
+                </header>
+                <p>{displayTime(previewSignal?.ts)} · age {displayAge(previewSignal?.age_sec ?? undefined)} · 참고용</p>
+                <div className={styles.signalProbabilityRow}>
+                  <span>LONG {safePercent(previewSignal?.long_pct).toFixed(1)}%</span>
+                  <span>SHORT {safePercent(previewSignal?.short_pct).toFixed(1)}%</span>
+                  <span>WAIT {safePercent(previewSignal?.wait_pct).toFixed(1)}%</span>
+                  <span>CONF {safePercent(previewSignal?.confidence_pct).toFixed(1)}%</span>
+                </div>
+                <small>{previewSignal?.note ?? '진행 중인 봉 기준 예비 신호이며 주문에 사용하지 않음'}</small>
+              </article>
+            </div>
+
+            <div className={styles.previewSafetyNotice} role="note">
+              주문 후보: {liveFeed?.mobile_order_candidate === 'LONG' || liveFeed?.mobile_order_candidate === 'SHORT'
+                ? `${liveFeed.mobile_order_candidate} — 확정 신호 기준`
+                : '없음'} · 예비 신호는 주문 불가
             </div>
 
             <div className={styles.historyNavigator} aria-label="가격 및 AI 차트 공통 표시 구간 이동">
@@ -1031,6 +1136,13 @@ export default function MobileSignalDashboard() {
                     <Line dataKey="ready_marker_price" name="READY" stroke="transparent" dot={{ r: 4, fill: '#22c55e', stroke: '#dcfce7', strokeWidth: 1 }} isAnimationActive={false} />
                     <Line dataKey="wait_marker_price" name="WAIT marker" stroke="transparent" dot={{ r: 4, fill: '#facc15', stroke: '#fef9c3', strokeWidth: 1 }} isAnimationActive={false} />
                     <Line dataKey="blocked_marker_price" name="BLOCKED" stroke="transparent" dot={{ r: 4, fill: '#fb7185', stroke: '#ffe4e6', strokeWidth: 1 }} isAnimationActive={false} />
+                    <Line
+                      dataKey="preview_marker_price"
+                      name="LIVE PREVIEW"
+                      stroke="transparent"
+                      dot={{ r: 6, fill: '#22d3ee', stroke: '#cffafe', strokeWidth: 2 }}
+                      isAnimationActive={false}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
@@ -1093,6 +1205,9 @@ export default function MobileSignalDashboard() {
                     <Line type="stepAfter" dataKey="short_stale" name="SHORT stale" stroke="#64748b" dot={false} strokeWidth={1.5} strokeDasharray="5 5" legendType="none" isAnimationActive={false} />
                     <Line type="stepAfter" dataKey="wait_stale" name="WAIT stale" stroke="#cbd5e1" dot={false} strokeWidth={1.5} strokeDasharray="5 5" legendType="none" isAnimationActive={false} />
                     <Line type="stepAfter" dataKey="hc_stale" name="HC stale" stroke="#475569" dot={false} strokeWidth={1.5} strokeDasharray="3 5" legendType="none" isAnimationActive={false} />
+                    <Line dataKey="preview_long_pct" name="Preview LONG" stroke="transparent" dot={{ r: 5, fill: '#22d3ee', stroke: '#cffafe', strokeWidth: 1 }} legendType="none" isAnimationActive={false} />
+                    <Line dataKey="preview_short_pct" name="Preview SHORT" stroke="transparent" dot={{ r: 5, fill: '#f472b6', stroke: '#fce7f3', strokeWidth: 1 }} legendType="none" isAnimationActive={false} />
+                    <Line dataKey="preview_wait_pct" name="Preview WAIT" stroke="transparent" dot={{ r: 5, fill: '#facc15', stroke: '#fef9c3', strokeWidth: 1 }} legendType="none" isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
