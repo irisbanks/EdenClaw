@@ -156,6 +156,33 @@ interface LivePreviewSignal {
   note: string;
 }
 
+interface ResearchCandidateRunnerUp {
+  candidate_id: string;
+  trades: number;
+  win_rate_pct: number;
+  profit_factor: number;
+  net_pnl_usdt: number;
+}
+
+interface ResearchCandidateSnapshot {
+  candidate_id: string;
+  label: string;
+  source: 'RESEARCH_SNAPSHOT';
+  snapshot_generated_at: string;
+  sample_period_note: string;
+  trades: number;
+  win_rate_pct: number;
+  profit_factor: number;
+  net_pnl_usdt: number;
+  max_drawdown_pct: number;
+  grade: 'A' | 'B' | 'C' | 'D';
+  verdict: string;
+  is_live_ready: false;
+  is_trade_eligible: false;
+  caveat: string;
+  runner_up: ResearchCandidateRunnerUp;
+}
+
 interface CandidateCondition {
   key: string;
   label: string;
@@ -257,6 +284,7 @@ interface LiveFeed {
   real_orders_placed?: number;
   confirmed_signal?: ConfirmedSignal;
   live_preview_signal?: LivePreviewSignal;
+  research_candidate?: ResearchCandidateSnapshot;
   readiness?: ReadinessSummary;
   bots?: {
     midpoint_0049: CandidateReadiness;
@@ -364,6 +392,17 @@ function displayConnection(value: ConnectionState): string {
   if (value === 'DELAYED') return '갱신 지연 — 주문 금지';
   if (value === 'STALE') return '실시간 아님 — 주문 금지';
   return '연결 끊김 — 주문 금지';
+}
+
+// Price freshness (live tick / live_preview_signal) is a separate signal from
+// the confirmed 15m AI signal's freshness. Conflating the two into a single
+// "연결 상태" badge made the whole page read as "not real-time" whenever the
+// AI signal was merely mid-candle (by design, up to ~30min), even though the
+// price feed itself was updating every few seconds. Keep them visually apart.
+function displayPriceStatus(value: 'FRESH' | 'STALE' | 'OFFLINE'): string {
+  if (value === 'FRESH') return '가격 실시간 정상';
+  if (value === 'STALE') return '가격 갱신 지연';
+  return '가격 연결 끊김';
 }
 
 function displayReason(value?: string): string {
@@ -652,6 +691,9 @@ export default function MobileSignalDashboard() {
     : [];
   const blockers = liveFeed?.blocker_breakdown ?? [];
   const priceLevels = liveFeed?.price_levels;
+  const priceStatus: 'FRESH' | 'STALE' | 'OFFLINE' =
+    liveFeed?.live_preview_signal?.status ??
+    (liveFeed?.price_stale ? 'STALE' : liveFeed ? 'FRESH' : 'OFFLINE');
   const isRealtimeUnsafe = Boolean(
     telemetryError ||
       !liveFeed ||
@@ -716,7 +758,7 @@ export default function MobileSignalDashboard() {
 
         {isRealtimeUnsafe ? (
           <div className={styles.staleBanner} role="alert" aria-live="assertive">
-            {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
+            AI 확정 신호: {displayConnection(liveFeed?.connection ?? 'OFFLINE')} · {displayPriceStatus(priceStatus)}
             <span className={styles.staleBannerDetail}>
               signal age {displayAge(liveFeed?.real_signal_age_sec ?? undefined)} · price age{' '}
               {displayAge(liveFeed?.real_price_age_sec ?? undefined)} · server now{' '}
@@ -729,8 +771,11 @@ export default function MobileSignalDashboard() {
           <span><strong>{bucketMinutes}분 단위</strong> / {rangeCaption}</span>
           <span>표시 구간: <strong>{displayTime(displayedStart)} ~ {displayTime(displayedEnd)}</strong></span>
           <span>총 데이터: <strong>{alignedChart.length}개</strong> / 현재 표시: <strong>{visibleSeries.length}개</strong></span>
+          <span className={priceStatus === 'FRESH' ? styles.viewStatusFresh : styles.viewStatusStale}>
+            {displayPriceStatus(priceStatus)}
+          </span>
           <span className={isRealtimeUnsafe ? styles.viewStatusStale : styles.viewStatusFresh}>
-            {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
+            AI 확정 신호: {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
           </span>
         </div>
 
@@ -745,10 +790,22 @@ export default function MobileSignalDashboard() {
               <span className={styles.label}>실시간 봇 텔레메트리</span>
               <h2 id="live-bot-title">BTCUSDT 현재 상태</h2>
             </div>
-            <span className={`${styles.connectionBadge} ${styles[(liveFeed?.connection ?? 'OFFLINE').toLowerCase()]}`}>
-              <span className={styles.liveDot} aria-hidden="true" />
-              {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
-            </span>
+            <div className={styles.headerBadges}>
+              <span
+                className={`${styles.connectionBadge} ${styles[priceStatus.toLowerCase()]}`}
+                title="실시간 가격 tick 기준"
+              >
+                <span className={styles.liveDot} aria-hidden="true" />
+                {displayPriceStatus(priceStatus)}
+              </span>
+              <span
+                className={`${styles.connectionBadge} ${styles[(liveFeed?.connection ?? 'OFFLINE').toLowerCase()]}`}
+                title="15분봉 확정 AI 신호 기준 — 주문 후보 판단에만 사용"
+              >
+                <span className={styles.liveDot} aria-hidden="true" />
+                AI 확정 신호 {displayConnection(liveFeed?.connection ?? 'OFFLINE')}
+              </span>
+            </div>
           </div>
 
           {telemetryError ? <p className={styles.telemetryError}>{telemetryError}</p> : null}
@@ -816,7 +873,7 @@ export default function MobileSignalDashboard() {
 
             <div className={`${styles.syncVerdict} ${isRealtimeUnsafe ? styles.syncStale : styles.syncFresh}`} role="status">
               {isRealtimeUnsafe
-                ? `${displayConnection(liveFeed?.connection ?? 'OFFLINE')} · 실시간 signal age ${displayAge(liveFeed?.real_signal_age_sec ?? undefined)}`
+                ? `AI 확정 신호 ${displayConnection(liveFeed?.connection ?? 'OFFLINE')} (age ${displayAge(liveFeed?.real_signal_age_sec ?? undefined)}) · ${displayPriceStatus(priceStatus)}`
                 : liveFeed?.signal_cycle_state === 'FRESH_PENDING_CANDLE'
                   ? `실시간 연결 정상 · 다음 ${bucketMinutes}분봉 확정 대기`
                   : `실시간 연결 정상 · 같은 ${bucketMinutes}분 timestamp 기준 as-of join 완료`}
@@ -928,7 +985,8 @@ export default function MobileSignalDashboard() {
             <div className={`${styles.alignmentMeta} ${isRealtimeUnsafe ? styles.staleSignal : styles.freshSignal}`}>
               <span>마지막 AI signal <strong>{displayTime(liveFeed?.latest_signal_ts)}</strong></span>
               <span>실시간 Signal age <strong>{displayAge(liveFeed?.real_signal_age_sec ?? undefined)}</strong></span>
-              <span>{displayConnection(liveFeed?.connection ?? 'OFFLINE')}</span>
+              <span>AI 확정 신호 {displayConnection(liveFeed?.connection ?? 'OFFLINE')}</span>
+              <span>{displayPriceStatus(priceStatus)}</span>
             </div>
           </section>
 
@@ -1021,6 +1079,43 @@ export default function MobileSignalDashboard() {
               ))}
             </div>
           </section>
+
+          {liveFeed?.research_candidate ? (
+            <section className={styles.researchSection} aria-labelledby="research-candidate-title">
+              <div className={styles.sectionHeading}>
+                <div>
+                  <span className={styles.label}>RESEARCH SNAPSHOT · 참고용, 주문 후보 아님</span>
+                  <h3 id="research-candidate-title">
+                    현재 최고 성과 연구 후보 — {liveFeed.research_candidate.label}
+                  </h3>
+                </div>
+                <span className={styles.researchGradeBadge}>
+                  GRADE {liveFeed.research_candidate.grade} · {liveFeed.research_candidate.verdict}
+                </span>
+              </div>
+              <dl className={styles.syncMetricGrid}>
+                <div><dt>승률</dt><dd>{liveFeed.research_candidate.win_rate_pct.toFixed(1)}%</dd></div>
+                <div><dt>Profit Factor</dt><dd>{liveFeed.research_candidate.profit_factor.toFixed(3)}</dd></div>
+                <div><dt>거래 건수</dt><dd>{liveFeed.research_candidate.trades}건</dd></div>
+                <div><dt>누적 순손익</dt><dd>{liveFeed.research_candidate.net_pnl_usdt.toFixed(2)} USDT</dd></div>
+                <div><dt>최대 낙폭</dt><dd>{liveFeed.research_candidate.max_drawdown_pct.toFixed(2)}%</dd></div>
+                <div><dt>표본 구간</dt><dd>{liveFeed.research_candidate.sample_period_note}</dd></div>
+                <div><dt>스냅샷 생성 시각</dt><dd>{displayTime(liveFeed.research_candidate.snapshot_generated_at)}</dd></div>
+                <div>
+                  <dt>차점 후보</dt>
+                  <dd>
+                    {liveFeed.research_candidate.runner_up.candidate_id} · 승률{' '}
+                    {liveFeed.research_candidate.runner_up.win_rate_pct.toFixed(1)}% · PF{' '}
+                    {liveFeed.research_candidate.runner_up.profit_factor.toFixed(3)} ·{' '}
+                    {liveFeed.research_candidate.runner_up.trades}건
+                  </dd>
+                </div>
+              </dl>
+              <p className={styles.researchCaveat} role="note">
+                {liveFeed.research_candidate.caveat}
+              </p>
+            </section>
+          ) : null}
 
           <div className={styles.chartSection}>
             <div className={styles.chartHeader}>

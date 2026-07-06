@@ -4,6 +4,7 @@ import path from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { fetchBitgetPublicCandles, type PublicCandle } from '@/lib/mobileSignal/bitgetPublicCandles';
+import { RESEARCH_CANDIDATE_SNAPSHOT } from '@/lib/mobileSignal/researchCandidate';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -1161,7 +1162,24 @@ function applyTimeframeToPayload(payload: JsonRecord, timeframe: Timeframe): Jso
   };
 }
 
+// Appends the read-only research-candidate snapshot to every GET response
+// path (success, degraded, error) without touching any of the existing
+// live-signal branches below — a pure post-processing wrapper so the new
+// display-only field can never affect connection/decision/order-candidate logic.
 export async function GET(req: NextRequest) {
+  const response = await getLiveSignal(req);
+  try {
+    const body = await response.json();
+    return NextResponse.json(
+      { ...body, research_candidate: RESEARCH_CANDIDATE_SNAPSHOT },
+      { status: response.status },
+    );
+  } catch {
+    return response;
+  }
+}
+
+async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
   const nowMs = Date.now();
   const range = parseRange(req);
   const requestedTimeframe = parseTimeframe(req);

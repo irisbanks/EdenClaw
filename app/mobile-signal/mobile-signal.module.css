@@ -94,6 +94,14 @@
   letter-spacing: -0.035em;
 }
 
+.headerBadges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
 .connectionBadge {
   display: inline-flex;
   align-items: center;
@@ -503,6 +511,36 @@
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 16px;
   background: rgba(2, 12, 9, 0.4);
+}
+
+.researchSection {
+  margin: 20px 24px 0;
+  padding: 18px;
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: 16px;
+  background: rgba(120, 53, 15, 0.12);
+}
+
+.researchGradeBadge {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.1);
+  color: #fde047;
+  font: 750 0.7rem/1 var(--font-geist-mono), monospace;
+  white-space: nowrap;
+}
+
+.researchCaveat {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  border-radius: 12px;
+  background: rgba(250, 204, 21, 0.06);
+  color: #fef3c7;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .sectionHeading {
