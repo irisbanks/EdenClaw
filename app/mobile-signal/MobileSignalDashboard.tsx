@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
   CartesianGrid,
   Legend,
   Line,
   LineChart,
+  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -16,6 +17,12 @@ import styles from './mobile-signal.module.css';
 
 const POLL_INTERVAL_MS = 5_000;
 const CHART_INITIAL_DIMENSION = { width: 800, height: 300 };
+
+// ── 텐션 브레이크아웃 시뮬레이션 상수 (조정 가능) ──────────────────────────
+const TENSION_THRESHOLD = 75; // %
+const BREAKOUT_USD = 250;
+const TAKE_PROFIT_USD = 300;
+const STOP_LOSS_USD = 500;
 
 type DisplayStatus = 'READY' | 'WAIT' | 'BLOCKED' | 'BLOCKED_STALE' | 'NO_SIGNAL';
 type ConnectionState = 'FRESH' | 'DELAYED' | 'STALE' | 'OFFLINE';
@@ -455,6 +462,205 @@ function firstFinite(...values: Array<number | null | undefined>): number | null
   return values.find((value): value is number => typeof value === 'number' && Number.isFinite(value)) ?? null;
 }
 
+// ── 텐션 브레이크아웃 시뮬레이션 (실험적 · 참고용) ──────────────────────────
+// 15m bucket 종가 기준 상태머신. 진입 방향은 AI 신호와 무관하게 앵커 대비
+// 가격 이탈 방향만 따른다. 실제 주문에는 전혀 반영되지 않는다.
+type TensionPhase = 'IDLE' | 'TENSION' | 'ENTERED';
+type TensionDirection = 'LONG' | 'SHORT';
+type TensionOutcome = 'TP' | 'SL' | 'OPEN';
+
+interface TensionTrade {
+  anchorTime: number;
+  anchorPrice: number;
+  entryTime: number | null;
+  entryPrice: number | null;
+  direction: TensionDirection | null;
+  exitTime: number | null;
+  exitPrice: number | null;
+  outcome: TensionOutcome | null;
+  pnl: number | null;
+}
+
+interface TensionPointState {
+  phase: TensionPhase;
+  direction: TensionDirection | null;
+  pnl: number | null;
+}
+
+interface TensionSimInput {
+  x: number;
+  price: number;
+  long_pct: number;
+  short_pct: number;
+}
+
+interface TensionSimResult {
+  trades: TensionTrade[];
+  pointStates: TensionPointState[];
+}
+
+function simulateTensionBreakout(points: ReadonlyArray<TensionSimInput>): TensionSimResult {
+  const trades: TensionTrade[] = [];
+  const pointStates: TensionPointState[] = [];
+
+  let phase: TensionPhase = 'IDLE';
+  let anchorSide: TensionDirection | null = null;
+  let current: TensionTrade | null = null;
+
+  for (const point of points) {
+    const longTension = point.long_pct >= TENSION_THRESHOLD;
+    const shortTension = point.short_pct >= TENSION_THRESHOLD;
+
+    if (phase === 'IDLE') {
+      if (longTension || shortTension) {
+        anchorSide = longTension ? 'LONG' : 'SHORT';
+        current = {
+          anchorTime: point.x,
+          anchorPrice: point.price,
+          entryTime: null,
+          entryPrice: null,
+          direction: null,
+          exitTime: null,
+          exitPrice: null,
+          outcome: null,
+          pnl: null,
+        };
+        phase = 'TENSION';
+      }
+      pointStates.push({ phase: 'IDLE', direction: null, pnl: null });
+      continue;
+    }
+
+    if (phase === 'TENSION' && current) {
+      // 반대쪽 75%가 새로 뜨면 앵커를 최신으로 갱신
+      const oppositeTriggered =
+        (anchorSide === 'LONG' && shortTension) || (anchorSide === 'SHORT' && longTension);
+      if (oppositeTriggered) {
+        anchorSide = anchorSide === 'LONG' ? 'SHORT' : 'LONG';
+        current.anchorTime = point.x;
+        current.anchorPrice = point.price;
+      }
+
+      if (point.price >= current.anchorPrice + BREAKOUT_USD) {
+        current.entryTime = point.x;
+        current.entryPrice = point.price;
+        current.direction = 'LONG';
+        phase = 'ENTERED';
+      } else if (point.price <= current.anchorPrice - BREAKOUT_USD) {
+        current.entryTime = point.x;
+        current.entryPrice = point.price;
+        current.direction = 'SHORT';
+        phase = 'ENTERED';
+      }
+
+      pointStates.push({ phase: 'TENSION', direction: null, pnl: null });
+      continue;
+    }
+
+    // phase === 'ENTERED'
+    if (current && current.entryPrice !== null && current.direction) {
+      const entry = current.entryPrice;
+      const direction = current.direction;
+      const runningPnl = direction === 'LONG' ? point.price - entry : entry - point.price;
+
+      const hitSL =
+        direction === 'LONG' ? point.price <= entry - STOP_LOSS_USD : point.price >= entry + STOP_LOSS_USD;
+      const hitTP =
+        direction === 'LONG' ? point.price >= entry + TAKE_PROFIT_USD : point.price <= entry - TAKE_PROFIT_USD;
+
+      // 같은 bucket에서 익절·손절 둘 다 걸리면 보수적으로 손절 처리
+      if (hitSL || hitTP) {
+        current.exitTime = point.x;
+        current.exitPrice = point.price;
+        current.outcome = hitSL ? 'SL' : 'TP';
+        current.pnl = runningPnl;
+        trades.push(current);
+        pointStates.push({ phase: 'ENTERED', direction, pnl: runningPnl });
+        current = null;
+        phase = 'IDLE';
+        anchorSide = null;
+        continue;
+      }
+
+      pointStates.push({ phase: 'ENTERED', direction, pnl: runningPnl });
+    } else {
+      pointStates.push({ phase: 'IDLE', direction: null, pnl: null });
+    }
+  }
+
+  // 마지막 bucket까지 미청산 포지션은 OPEN으로 표시 + 미실현 손익 계산
+  if (phase === 'ENTERED' && current && current.direction && current.entryPrice !== null) {
+    const lastPoint = points[points.length - 1];
+    current.pnl =
+      current.direction === 'LONG'
+        ? lastPoint.price - current.entryPrice
+        : current.entryPrice - lastPoint.price;
+    current.outcome = 'OPEN';
+    trades.push(current);
+  }
+
+  return { trades, pointStates };
+}
+
+function tensionPhaseLabel(phase: TensionPhase, direction: TensionDirection | null): string {
+  if (phase === 'ENTERED') return `진입 · ${direction ?? ''}`;
+  if (phase === 'TENSION') return '텐션';
+  return 'IDLE';
+}
+
+function TensionTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload?: TimeAlignedPoint & Record<string, unknown> }>;
+}) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0]?.payload;
+  if (!point) return null;
+  const phase = (point.tension_phase as TensionPhase | undefined) ?? 'IDLE';
+  const direction = (point.tension_direction as TensionDirection | null | undefined) ?? null;
+  const pnl = point.tension_pnl as number | null | undefined;
+  return (
+    <div className={styles.chartTooltip}>
+      <strong>{chartTime(point.ts, true)}</strong>
+      <span>가격 {displayNumber(point.price)}</span>
+      <span>상태 {tensionPhaseLabel(phase, direction)}</span>
+      {typeof pnl === 'number' ? (
+        <span className={pnl >= 0 ? styles.tooltipFresh : styles.tooltipStale}>
+          진입 대비 손익 {pnl >= 0 ? '+' : ''}
+          {pnl.toFixed(2)}$
+        </span>
+      ) : null}
+      <span className={styles.tooltipStale}>실험적 시뮬레이션 · 주문 근거 사용 금지</span>
+    </div>
+  );
+}
+
+function TriangleUpDot(props: { cx?: number; cy?: number; value?: number | null }) {
+  const { cx, cy, value } = props;
+  if (value === null || value === undefined || cx === undefined || cy === undefined) return null;
+  return <path d={`M ${cx} ${cy - 7} L ${cx - 6} ${cy + 5} L ${cx + 6} ${cy + 5} Z`} fill="#22c55e" stroke="#dcfce7" strokeWidth={1} />;
+}
+
+function TriangleDownDot(props: { cx?: number; cy?: number; value?: number | null }) {
+  const { cx, cy, value } = props;
+  if (value === null || value === undefined || cx === undefined || cy === undefined) return null;
+  return <path d={`M ${cx} ${cy + 7} L ${cx - 6} ${cy - 5} L ${cx + 6} ${cy - 5} Z`} fill="#ef4444" stroke="#fee2e2" strokeWidth={1} />;
+}
+
+function XMarkDot(props: { cx?: number; cy?: number; value?: number | null }) {
+  const { cx, cy, value } = props;
+  if (value === null || value === undefined || cx === undefined || cy === undefined) return null;
+  const s = 5;
+  return (
+    <g>
+      <line x1={cx - s} y1={cy - s} x2={cx + s} y2={cy + s} stroke="#ef4444" strokeWidth={2} />
+      <line x1={cx - s} y1={cy + s} x2={cx + s} y2={cy - s} stroke="#ef4444" strokeWidth={2} />
+    </g>
+  );
+}
+
 interface ChartPoint extends TimeAlignedPoint {
   x: number;
   time: string;
@@ -733,6 +939,65 @@ export default function MobileSignalDashboard() {
   const xMin = visibleSeries[0]?.x;
   const xMax = visibleSeries.at(-1)?.x;
   const sharedXDomain: [number, number] = [xMin ?? 0, xMax ?? 0];
+
+  // 텐션 브레이크아웃 시뮬레이션 — 기존 차트와 동일한 visibleSeries(96개 15m
+  // bucket)만 재사용, 새 API 호출 없음. 하이드레이션 불일치를 피하기 위해
+  // useMemo로 순수 계산만 수행한다.
+  const tensionSim = useMemo(() => {
+    if (visibleSeries.length === 0) return { trades: [] as TensionTrade[], points: [] as Array<ChartPoint & Record<string, unknown>> };
+
+    const simInput: TensionSimInput[] = visibleSeries.map((point) => ({
+      x: point.x,
+      price: firstFinite(point.price, point.close, point.mid) ?? 0,
+      long_pct: point.long_pct ?? 0,
+      short_pct: point.short_pct ?? 0,
+    }));
+    const { trades, pointStates } = simulateTensionBreakout(simInput);
+
+    const tensionMarkerAt = new Map<number, number>();
+    const tpExitAt = new Map<number, number>();
+    const slExitAt = new Map<number, number>();
+    const longEntryAt = new Map<number, number>();
+    const shortEntryAt = new Map<number, number>();
+    for (const trade of trades) {
+      tensionMarkerAt.set(trade.anchorTime, trade.anchorPrice);
+      if (trade.entryTime !== null && trade.entryPrice !== null) {
+        if (trade.direction === 'LONG') longEntryAt.set(trade.entryTime, trade.entryPrice);
+        else if (trade.direction === 'SHORT') shortEntryAt.set(trade.entryTime, trade.entryPrice);
+      }
+      if (trade.exitTime !== null && trade.exitPrice !== null) {
+        if (trade.outcome === 'TP') tpExitAt.set(trade.exitTime, trade.exitPrice);
+        else if (trade.outcome === 'SL') slExitAt.set(trade.exitTime, trade.exitPrice);
+      }
+    }
+
+    const points = visibleSeries.map((point, index) => {
+      const state = pointStates[index];
+      return {
+        ...point,
+        tension_marker_price: tensionMarkerAt.has(point.x) ? tensionMarkerAt.get(point.x) : null,
+        tp_exit_price: tpExitAt.has(point.x) ? tpExitAt.get(point.x) : null,
+        sl_exit_price: slExitAt.has(point.x) ? slExitAt.get(point.x) : null,
+        entry_long_price: longEntryAt.has(point.x) ? longEntryAt.get(point.x) : null,
+        entry_short_price: shortEntryAt.has(point.x) ? shortEntryAt.get(point.x) : null,
+        tension_phase: state?.phase ?? 'IDLE',
+        tension_direction: state?.direction ?? null,
+        tension_pnl: state?.pnl ?? null,
+      };
+    });
+
+    return { trades, points };
+  }, [visibleSeries]);
+
+  const tensionTrades = tensionSim.trades;
+  const tensionLastX = tensionSim.points.at(-1)?.x ?? sharedXDomain[1];
+  const tensionClosedTrades = tensionTrades.filter((t) => t.outcome === 'TP' || t.outcome === 'SL');
+  const tensionTpCount = tensionTrades.filter((t) => t.outcome === 'TP').length;
+  const tensionSlCount = tensionTrades.filter((t) => t.outcome === 'SL').length;
+  const tensionWinRate = tensionClosedTrades.length > 0 ? (tensionTpCount / tensionClosedTrades.length) * 100 : 0;
+  const tensionCumulativePnl = tensionTrades.reduce((sum, t) => sum + (t.pnl ?? 0), 0);
+  const tensionHasOpenPosition = tensionTrades.some((t) => t.outcome === 'OPEN');
+
   const latestSignalX = new Date(liveFeed?.latest_signal_ts ?? '').getTime();
   const readiness = liveFeed?.readiness;
   const rawCandidates = liveFeed?.bots
@@ -1424,6 +1689,125 @@ export default function MobileSignalDashboard() {
             <p className={styles.fixedTimeframeNotice}>
               ⚠ 실험적 참고용 차트입니다 — 원본 confirmed_signal의 LONG/SHORT를 단순히 뒤바꾼
               값이며, 별도로 검증된 예측 모델이 아닙니다. 주문 후보(mobile_order_candidate)에는
+              반영되지 않고, 반영될 수도 없습니다.
+            </p>
+          </div>
+
+          <div className={styles.chartSection}>
+            <div className={styles.chartHeader}>
+              <div>
+                <h3>텐션 브레이크아웃 시뮬레이션 (실험적) · 참고용 · 주문 근거 사용 금지</h3>
+                <p>
+                  같은 {bucketMinutes}분 timestamp의 가격/LONG%/SHORT%만 재사용한 자체 시뮬레이션입니다.
+                  LONG 또는 SHORT 확률이 {TENSION_THRESHOLD}% 이상이면 텐션 진입, 이후 앵커가 형성된
+                  가격에서 ±${BREAKOUT_USD} 이탈 시(AI 신호 방향과 무관하게 이탈 방향으로) 가상 진입,
+                  +${TAKE_PROFIT_USD} 익절 / -${STOP_LOSS_USD} 손절로 청산합니다.
+                  15m bucket 종가 기준이라 봉 내부 가격 움직임은 반영되지 않습니다.
+                </p>
+              </div>
+              <span>동일 구간 {visibleSeries.length}개 {bucketMinutes}m bucket · 실험적</span>
+            </div>
+
+            <dl className={styles.syncMetricGrid}>
+              <div><dt>총 트레이드</dt><dd>{tensionTrades.length}건</dd></div>
+              <div><dt>익절 / 손절</dt><dd>{tensionTpCount} / {tensionSlCount}</dd></div>
+              <div><dt>승률</dt><dd>{tensionClosedTrades.length > 0 ? `${tensionWinRate.toFixed(1)}%` : '—'}</dd></div>
+              <div><dt>누적 손익</dt><dd>{tensionCumulativePnl >= 0 ? '+' : ''}{tensionCumulativePnl.toFixed(2)}$</dd></div>
+              <div><dt>미청산 포지션</dt><dd>{tensionHasOpenPosition ? '있음 (OPEN)' : '없음'}</dd></div>
+            </dl>
+
+            <div className={styles.chartCanvas} role="img" aria-label="텐션 브레이크아웃 시뮬레이션(실험적) 그래프">
+              {chartReady && tensionSim.points.length ? (
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  minWidth={0}
+                  minHeight={0}
+                  initialDimension={CHART_INITIAL_DIMENSION}
+                >
+                  <LineChart
+                    data={tensionSim.points}
+                    margin={{ top: 12, right: 12, bottom: 2, left: 4 }}
+                    syncId={CHART_SYNC_ID}
+                  >
+                    <CartesianGrid stroke="rgba(148, 163, 184, 0.13)" strokeDasharray="4 4" vertical={false} />
+                    <XAxis
+                      dataKey="x"
+                      type="number"
+                      scale="time"
+                      domain={sharedXDomain}
+                      allowDataOverflow
+                      stroke="#64748b"
+                      tick={{ fontSize: 10 }}
+                      minTickGap={48}
+                      tickFormatter={(value) => chartTime(new Date(Number(value)).toISOString())}
+                    />
+                    <YAxis
+                      domain={['auto', 'auto']}
+                      stroke="#64748b"
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(value) => displayNumber(Number(value))}
+                      width={64}
+                    />
+                    <Tooltip content={<TensionTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+
+                    {tensionTrades.map((trade, index) => {
+                      const bandEnd = trade.entryTime ?? tensionLastX;
+                      const shadeEnd = trade.exitTime ?? tensionLastX;
+                      const shadeColor =
+                        trade.outcome === 'SL'
+                          ? '#ef4444'
+                          : trade.pnl !== null && trade.pnl < 0
+                            ? '#ef4444'
+                            : '#22c55e';
+                      return (
+                        <Fragment key={`trade-${index}-${trade.anchorTime}`}>
+                          <ReferenceArea
+                            x1={trade.anchorTime}
+                            x2={bandEnd}
+                            y1={trade.anchorPrice - BREAKOUT_USD}
+                            y2={trade.anchorPrice + BREAKOUT_USD}
+                            fill="#a855f7"
+                            fillOpacity={0.08}
+                            stroke="none"
+                            ifOverflow="visible"
+                          />
+                          {trade.entryTime !== null ? (
+                            <ReferenceArea
+                              x1={trade.entryTime}
+                              x2={shadeEnd}
+                              fill={shadeColor}
+                              fillOpacity={0.1}
+                              stroke="none"
+                              ifOverflow="visible"
+                            />
+                          ) : null}
+                          <ReferenceLine
+                            x={trade.anchorTime}
+                            stroke="#a855f7"
+                            strokeDasharray="4 4"
+                            ifOverflow="visible"
+                          />
+                        </Fragment>
+                      );
+                    })}
+
+                    <Line type="monotone" dataKey="price" name="Mid" stroke="#4ade80" dot={false} strokeWidth={2} isAnimationActive={false} />
+                    <Line dataKey="tension_marker_price" name="텐션 시작" stroke="transparent" dot={{ r: 5, fill: '#a855f7', stroke: '#f3e8ff', strokeWidth: 1 }} isAnimationActive={false} />
+                    <Line dataKey="entry_long_price" name="LONG 진입" stroke="transparent" dot={<TriangleUpDot />} isAnimationActive={false} />
+                    <Line dataKey="entry_short_price" name="SHORT 진입" stroke="transparent" dot={<TriangleDownDot />} isAnimationActive={false} />
+                    <Line dataKey="tp_exit_price" name="익절" stroke="transparent" dot={{ r: 5, fill: '#22c55e', stroke: '#dcfce7', strokeWidth: 1 }} isAnimationActive={false} />
+                    <Line dataKey="sl_exit_price" name="손절" stroke="transparent" dot={<XMarkDot />} isAnimationActive={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className={styles.chartEmpty}>가격 데이터를 기다리는 중입니다.</div>
+              )}
+            </div>
+            <p className={styles.fixedTimeframeNotice}>
+              ⚠ 실험적 참고용 차트입니다 — 15m bucket 종가 기준 자체 시뮬레이션이며 봉 내부 움직임은
+              반영되지 않습니다. 검증된 전략이 아니며 주문 후보(mobile_order_candidate)에는 전혀
               반영되지 않고, 반영될 수도 없습니다.
             </p>
           </div>
