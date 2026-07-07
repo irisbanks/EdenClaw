@@ -1210,8 +1210,18 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
     rawSignals: ReadonlyArray<Record<string, unknown>>,
     midpointReadiness: number,
     fallbackSeries: JsonRecord[],
-  ): { series: JsonRecord[]; priceSource: string } => {
+  ): { series: JsonRecord[]; priceSource: string; rawSignalTimestamps: Set<string> } => {
     const unified = mergeSignalSources(rawSignals, storedSignalHistory);
+    // Timestamps backed by an authoritative raw signal row on THIS request (CSV
+    // tail / relay), as opposed to a forward-filled DB history row. Only these
+    // buckets carry a value that could have just been confirmed/corrected, so
+    // only these are worth re-persisting below.
+    const rawSignalTimestamps = new Set<string>();
+    for (const signal of rawSignals) {
+      const ts = asString(signal.timestamp);
+      const parsed = new Date(ts).getTime();
+      if (ts && !Number.isNaN(parsed)) rawSignalTimestamps.add(new Date(parsed).toISOString());
+    }
     if (publicCandles.length > 0) {
       return {
         series: buildCandleAlignedSeries(
@@ -1221,9 +1231,14 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
           staleSeconds,
         ) as unknown as JsonRecord[],
         priceSource: 'BITGET_PUBLIC_CANDLES',
+        rawSignalTimestamps,
       };
     }
-    return { series: fallbackSeries.slice(-rangePoints), priceSource: 'LOCAL_TICK_RESAMPLE_FALLBACK' };
+    return {
+      series: fallbackSeries.slice(-rangePoints),
+      priceSource: 'LOCAL_TICK_RESAMPLE_FALLBACK',
+      rawSignalTimestamps,
+    };
   };
 
   // Attach range metadata + the signal-history availability note, then normalize.
@@ -1252,25 +1267,46 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
     );
   };
 
-  // Persist the latest 15m bucket snapshot (best-effort, never fatal).
-  const persistLatestBucket = (series: JsonRecord[]): void => {
-    const latest = series.at(-1);
-    if (!latest || !isRecord(latest) || !asString(latest.ts)) return;
-    void saveSignalHistoryRow(asString(latest.ts), {
-      ts: asString(latest.ts),
-      price: asNumber(latest.price),
-      hc: asNumber(latest.hc),
-      long_pct: asNumber(latest.long_pct),
-      short_pct: asNumber(latest.short_pct),
-      wait_pct: asNumber(latest.wait_pct),
-      hc70_ready_pct: asNumber(latest.hc70_ready_pct),
-      hc085_ready_pct: asNumber(latest.hc085_ready_pct),
-      hc090_ready_pct: asNumber(latest.hc090_ready_pct),
-      overall_readiness_pct: asNumber(latest.overall_readiness_pct),
-      decision: asString(latest.decision, 'WAIT'),
-      ticket_status: asString(latest.status, 'WAIT'),
-      signal_stale: latest.signal_stale === true,
+  // Persist 15m bucket snapshots (best-effort, never fatal).
+  //
+  // Bug fixed here: this used to persist ONLY series.at(-1) (the single most
+  // recent bucket). But a bucket's AI signal can still be revised/confirmed by
+  // the model AFTER it stops being "the latest" bucket (e.g. it was first
+  // written as a preliminary/forward-filled value, then the CSV confirms the
+  // real value a poll or two later). Since this function was never invoked
+  // again for that bucket_ts once a newer bucket existed, the DB row was
+  // frozen at its first (often preliminary/wrong) value forever — the root
+  // cause of the eden_mobile_signal_history corruption. Fix: also re-persist
+  // every bucket in `series` whose timestamp is backed by an authoritative raw
+  // signal row on THIS request (`rawSignalTimestamps`), so any correction the
+  // source makes to a recent bucket gets written back on the very next poll.
+  const persistBucket = (bucket: JsonRecord): void => {
+    if (!isRecord(bucket) || !asString(bucket.ts)) return;
+    void saveSignalHistoryRow(asString(bucket.ts), {
+      ts: asString(bucket.ts),
+      price: asNumber(bucket.price),
+      hc: asNumber(bucket.hc),
+      long_pct: asNumber(bucket.long_pct),
+      short_pct: asNumber(bucket.short_pct),
+      wait_pct: asNumber(bucket.wait_pct),
+      hc70_ready_pct: asNumber(bucket.hc70_ready_pct),
+      hc085_ready_pct: asNumber(bucket.hc085_ready_pct),
+      hc090_ready_pct: asNumber(bucket.hc090_ready_pct),
+      overall_readiness_pct: asNumber(bucket.overall_readiness_pct),
+      decision: asString(bucket.decision, 'WAIT'),
+      ticket_status: asString(bucket.status, 'WAIT'),
+      signal_stale: bucket.signal_stale === true,
     }).catch(() => undefined);
+  };
+
+  const persistLatestBucket = (series: JsonRecord[], rawSignalTimestamps?: Set<string>): void => {
+    const latest = series.at(-1);
+    if (isRecord(latest) && asString(latest.ts)) persistBucket(latest);
+    if (!rawSignalTimestamps || rawSignalTimestamps.size === 0) return;
+    for (const point of series) {
+      if (point === latest) continue; // already persisted above
+      if (isRecord(point) && rawSignalTimestamps.has(asString(point.ts))) persistBucket(point);
+    }
   };
 
   try {
@@ -1375,11 +1411,11 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
       bucketSeconds,
       staleSeconds,
     ) as unknown as JsonRecord[];
-    const { series: timeAlignedSeries, priceSource } = alignSeries(
-      signalHistory,
-      midpoint.readiness_pct,
-      localFallbackSeries,
-    );
+    const {
+      series: timeAlignedSeries,
+      priceSource,
+      rawSignalTimestamps: timeAlignedRawTimestamps,
+    } = alignSeries(signalHistory, midpoint.readiness_pct, localFallbackSeries);
     const latestAligned = timeAlignedSeries.at(-1);
     const blockerBreakdown = [
       {
@@ -1555,7 +1591,7 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
         },
       };
 
-    persistLatestBucket(timeAlignedSeries);
+    persistLatestBucket(timeAlignedSeries, timeAlignedRawTimestamps);
 
     const finalPayload = withRangeMeta(localPayload, timeAlignedSeries, priceSource);
     const baseConnection = oldestConnection(bridgeState, collectorState, sourceState);
@@ -1602,7 +1638,7 @@ async function getLiveSignal(req: NextRequest): Promise<NextResponse> {
           ? stored.payload.time_aligned_series.filter(isRecord)
           : [];
         const relayAligned = alignSeries(relaySignals, relayMidpointReadiness, relayFallback);
-        persistLatestBucket(relayAligned.series);
+        persistLatestBucket(relayAligned.series, relayAligned.rawSignalTimestamps);
         const finalRelayPayload = withRangeMeta(relayPayload, relayAligned.series, relayAligned.priceSource);
         // The relayed payload is the local machine's full /live response at
         // publish time, so it still carries the raw (non-bucket-aligned)
