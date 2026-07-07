@@ -463,6 +463,10 @@ interface ChartPoint extends TimeAlignedPoint {
   preview_long_pct?: number;
   preview_short_pct?: number;
   preview_wait_pct?: number;
+  long_inverted: number | null;
+  short_inverted: number | null;
+  wait_inverted: number | null;
+  hc_inverted: number | null;
 }
 
 // Rich tooltip for the AI probability chart: time, price, HC, LONG/SHORT/WAIT,
@@ -503,6 +507,45 @@ function AiSignalTooltip({
               <span>WAIT {safePercent(point.preview_wait_pct).toFixed(1)}% · 주문 불가</span>
             </div>
           ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+function invertDecision(decision: string): string {
+  if (decision === 'LONG') return 'SHORT';
+  if (decision === 'SHORT') return 'LONG';
+  return decision;
+}
+
+// 역신호(실험적) 차트 툴팁 — 같은 캔들의 LONG/SHORT만 뒤바꿔 보여준다. HC/WAIT/decision
+// 은 원본 confirmed_signal 값 그대로이며, 새로운 모델이나 실제 검증된 신호가 아니다.
+function InvertedSignalTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload?: ChartPoint }>;
+}) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0]?.payload;
+  if (!point) return null;
+  const noHistory = point.signal_history_available === false || point.decision === 'NO_SIGNAL_HISTORY';
+  return (
+    <div className={styles.chartTooltip}>
+      <strong>{chartTime(point.ts, true)}</strong>
+      <span>가격 {displayNumber(point.close ?? point.price)}</span>
+      {noHistory ? (
+        <span className={styles.tooltipStale}>과거 AI 시그널 기록 없음</span>
+      ) : (
+        <>
+          <span>HC {Number(point.hc ?? 0).toFixed(4)}</span>
+          <span>LONG {safePercent(point.long_inverted).toFixed(1)}%</span>
+          <span>SHORT {safePercent(point.short_inverted).toFixed(1)}%</span>
+          <span>WAIT {safePercent(point.wait_inverted).toFixed(1)}%</span>
+          <span>decision {invertDecision(point.decision)} (원본 {point.decision} 반전)</span>
+          <span className={styles.tooltipStale}>실험적 역신호 · 주문 근거로 사용 금지</span>
         </>
       )}
     </div>
@@ -670,6 +713,12 @@ export default function MobileSignalDashboard() {
     preview_long_pct: index === alignedSource.length - 1 ? previewSignal?.long_pct : undefined,
     preview_short_pct: index === alignedSource.length - 1 ? previewSignal?.short_pct : undefined,
     preview_wait_pct: index === alignedSource.length - 1 ? previewSignal?.wait_pct : undefined,
+    // 실험적 역신호 — 기존 confirmed_signal 값의 LONG/SHORT 만 서버 변경 없이 클라이언트에서
+    // 뒤바꿔 별도 차트로 보여준다. WAIT/HC 는 원본과 동일(반전 대상 아님).
+    long_inverted: point.stale ? null : point.short_pct,
+    short_inverted: point.stale ? null : point.long_pct,
+    wait_inverted: point.stale ? null : point.wait_pct,
+    hc_inverted: point.stale ? null : point.hc_pct,
   }));
   const effectiveWindowSize = Math.max(1, Math.min(chartWindowSize, alignedChart.length || 1));
   const maxWindowStart = Math.max(0, alignedChart.length - effectiveWindowSize);
@@ -1309,6 +1358,74 @@ export default function MobileSignalDashboard() {
                 <div className={styles.chartEmpty}>모델 시그널 이력을 기다리는 중입니다.</div>
               )}
             </div>
+          </div>
+
+          <div className={styles.chartSection}>
+            <div className={styles.chartHeader}>
+              <div>
+                <h3>역신호 (실험적) — LONG/SHORT 반전 ({bucketMinutes}m · {rangeCaption})</h3>
+                <p>
+                  위 AI 시그널 확률 차트와 완전히 같은 {bucketMinutes}분 timestamp — LONG/SHORT 값만
+                  서로 바꿔서 표시합니다. 15m/30m 구간에서 실제 가격 움직임과 방향이 반대로 보인다는
+                  관찰을 참고용으로 나란히 비교하기 위한 것으로, 검증된 신호가 아니며 주문 근거로
+                  사용할 수 없습니다.
+                </p>
+              </div>
+              <span>동일 구간 {visibleSeries.length}개 {bucketMinutes}m bucket · 실험적</span>
+            </div>
+            <div className={styles.chartCanvas} role="img" aria-label="역신호(실험적) LONG/SHORT 반전 그래프">
+              {chartReady && visibleSeries.length ? (
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  minWidth={0}
+                  minHeight={0}
+                  initialDimension={CHART_INITIAL_DIMENSION}
+                >
+                  <LineChart
+                    data={visibleSeries}
+                    margin={{ top: 12, right: 12, bottom: 2, left: 4 }}
+                    syncId={CHART_SYNC_ID}
+                  >
+                    <CartesianGrid stroke="rgba(148, 163, 184, 0.13)" strokeDasharray="4 4" vertical={false} />
+                    <XAxis
+                      dataKey="x"
+                      type="number"
+                      scale="time"
+                      domain={sharedXDomain}
+                      allowDataOverflow
+                      stroke="#64748b"
+                      tick={{ fontSize: 10 }}
+                      minTickGap={48}
+                      tickFormatter={(value) => chartTime(new Date(Number(value)).toISOString())}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      stroke="#64748b"
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(value) => `${Math.round(Number(value))}%`}
+                      width={42}
+                    />
+                    <Tooltip content={<InvertedSignalTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <ReferenceLine y={70} stroke="#facc15" strokeDasharray="5 5" label={{ value: 'HC70', fill: '#fde047', fontSize: 9, position: 'insideLeft' }} />
+                    <ReferenceLine y={85} stroke="#fb923c" strokeDasharray="4 4" label={{ value: 'HC85', fill: '#fdba74', fontSize: 9, position: 'insideLeft' }} />
+                    <ReferenceLine y={90} stroke="#fb7185" strokeDasharray="3 4" label={{ value: 'HC90', fill: '#fda4af', fontSize: 9, position: 'insideLeft' }} />
+                    <Line type="stepAfter" dataKey="long_inverted" name="LONG (반전)" stroke="#4ade80" dot={false} strokeWidth={2} strokeDasharray="2 2" isAnimationActive={false} />
+                    <Line type="stepAfter" dataKey="short_inverted" name="SHORT (반전)" stroke="#fb7185" dot={false} strokeWidth={2} strokeDasharray="2 2" isAnimationActive={false} />
+                    <Line type="stepAfter" dataKey="wait_inverted" name="WAIT" stroke="#facc15" dot={false} strokeWidth={2} isAnimationActive={false} />
+                    <Line type="stepAfter" dataKey="hc_inverted" name="HC" stroke="#a78bfa" dot={false} strokeWidth={1.5} strokeDasharray="3 3" isAnimationActive={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className={styles.chartEmpty}>모델 시그널 이력을 기다리는 중입니다.</div>
+              )}
+            </div>
+            <p className={styles.fixedTimeframeNotice}>
+              ⚠ 실험적 참고용 차트입니다 — 원본 confirmed_signal의 LONG/SHORT를 단순히 뒤바꾼
+              값이며, 별도로 검증된 예측 모델이 아닙니다. 주문 후보(mobile_order_candidate)에는
+              반영되지 않고, 반영될 수도 없습니다.
+            </p>
           </div>
 
           <p className={styles.feedNote}>
