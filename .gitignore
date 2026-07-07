@@ -3,13 +3,14 @@ node_modules/
 .turbo/
 dist/
 *.log
+!public/swarm-progress.log
 .env
 .env.local
 prisma/dev.db
 prisma/dev.db-journal
 venv/
 __pycache__/
-logs/
+/logs/
 *.backup-v1
 
 # ── 대용량 AI 가중치 / 체크포인트 / 백업 (git 추적 금지) ──

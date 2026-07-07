@@ -3,6 +3,7 @@
 .next-dev
 node_modules
 *.log
+!public/swarm-progress.log
 .env*
 public/uploads
 

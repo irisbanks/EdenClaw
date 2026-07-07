@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const DEFAULT_TARGET_PATH = 'app/api/swarm/generated/route.ts';
+const PROGRESS_LOG_URL = '/api/swarm/logs';
+const MAX_TERMINAL_LINES = 160;
 
 type TerminalLine = {
   id: number;
@@ -10,32 +12,127 @@ type TerminalLine = {
   tone?: 'info' | 'ok' | 'error' | 'muted';
 };
 
+const INITIAL_TERMINAL_LINES: TerminalLine[] = [
+  {
+    id: 1,
+    tone: 'muted',
+    text: '[ready] READY · Codex → Claude build feedback loop 대기 중',
+  },
+];
+
 function nowLabel(): string {
   return new Date().toLocaleTimeString();
 }
 
+function toneFromLogLine(line: string): TerminalLine['tone'] {
+  if (/\[(ERROR|FATAL|FAIL|TSC_FAIL)\]|\bfailed\b|\berror\b/i.test(line)) return 'error';
+  if (/\[DONE\]|deployment-ready|build passed|SWARM_LOOP_RUNNING|\[TSC_OK\]/i.test(line)) return 'ok';
+  if (/\[(WARN)\]|Feedback|feeding/i.test(line)) return 'info';
+  return 'muted';
+}
+
+function timestampFromLogLine(line: string): number | null {
+  const match = line.match(/^\[([^\]]+)\]/);
+  if (!match) return null;
+
+  const timestamp = Date.parse(match[1]);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 export default function TradingPage() {
+  const lineIdRef = useRef(1);
+  const progressPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollStartedAtRef = useRef(0);
+  const pollErrorReportedRef = useRef(false);
   const [task, setTask] = useState('');
   const [running, setRunning] = useState(false);
-  const [lines, setLines] = useState<TerminalLine[]>([
-    {
-      id: 1,
-      tone: 'muted',
-      text: `[${nowLabel()}] READY · Codex → Claude build feedback loop 대기 중`,
-    },
-  ]);
+  const [lines, setLines] = useState<TerminalLine[]>(INITIAL_TERMINAL_LINES);
 
   const canRun = useMemo(() => task.trim().length > 0 && !running, [task, running]);
+
+  useEffect(() => {
+    return () => {
+      if (progressPollingRef.current) {
+        clearInterval(progressPollingRef.current);
+      }
+    };
+  }, []);
 
   function push(text: string, tone: TerminalLine['tone'] = 'info') {
     setLines((prev) => [
       ...prev,
       {
-        id: Date.now() + Math.random(),
+        id: ++lineIdRef.current,
         tone,
         text: `[${nowLabel()}] ${text}`,
       },
     ].slice(-120));
+  }
+
+  function stopProgressPolling() {
+    if (!progressPollingRef.current) return;
+    clearInterval(progressPollingRef.current);
+    progressPollingRef.current = null;
+  }
+
+  function applyProgressLog(logText: string): { done: boolean; failed: boolean } {
+    const rawLines = logText.split(/\r?\n/).filter(Boolean);
+    const latestLines = rawLines.slice(-MAX_TERMINAL_LINES);
+    const renderedLines = latestLines.map((line, index): TerminalLine => ({
+      id: index + 1,
+      tone: toneFromLogLine(line),
+      text: line,
+    }));
+
+    if (renderedLines.length > 0) {
+      lineIdRef.current = Math.max(lineIdRef.current, renderedLines.length + 1);
+      setLines(renderedLines);
+    }
+
+    const isCurrentRun = (line: string) => {
+      const timestamp = timestampFromLogLine(line);
+      return timestamp === null || timestamp >= pollStartedAtRef.current;
+    };
+
+    const done = rawLines.some((line) => /\[DONE\]|deployment-ready/i.test(line) && isCurrentRun(line));
+    const failed = rawLines.some((line) => /\[(FAIL|FATAL)\]/i.test(line) && isCurrentRun(line));
+
+    return { done, failed };
+  }
+
+  async function pollProgressLog() {
+    try {
+      const response = await fetch(`${PROGRESS_LOG_URL}?ts=${Date.now()}`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) return;
+
+      const logText = await response.text();
+      const { done, failed } = applyProgressLog(logText);
+
+      if (done || failed) {
+        stopProgressPolling();
+        setRunning(false);
+        if (failed) push('SWARM LOOP FAILED — 원본 파일이 복구되었습니다.', 'error');
+        else push('SWARM LOOP DONE — deployment-ready', 'ok');
+      }
+    } catch (error) {
+      if (!pollErrorReportedRef.current) {
+        pollErrorReportedRef.current = true;
+        push(`LOG POLL ERROR · ${error instanceof Error ? error.message : 'progress log fetch failed'}`, 'error');
+      }
+    }
+  }
+
+  function startProgressPolling() {
+    stopProgressPolling();
+    pollErrorReportedRef.current = false;
+    pollStartedAtRef.current = Date.now() - 1000;
+    void pollProgressLog();
+    progressPollingRef.current = setInterval(() => {
+      void pollProgressLog();
+    }, 1000);
   }
 
   async function runSwarm() {
@@ -43,6 +140,7 @@ export default function TradingPage() {
     if (!prompt || running) return;
 
     setRunning(true);
+    startProgressPolling();
     push('Codex 단계 준비 · 작업 프롬프트를 백엔드 루프에 전달합니다.', 'info');
     push(`TARGET · ${DEFAULT_TARGET_PATH}`, 'muted');
 
@@ -70,7 +168,6 @@ export default function TradingPage() {
       push('결과 로그는 서버 프로세스에서 계속 누적됩니다. UI는 락 없이 즉시 반환되었습니다.', 'muted');
     } catch (error) {
       push(`ERROR · ${error instanceof Error ? error.message : 'Swarm 요청 실패'}`, 'error');
-    } finally {
       setRunning(false);
     }
   }

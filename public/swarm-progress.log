@@ -1,0 +1,51 @@
+[bootstrap] [LOG] swarm-progress log ready
+[2026-07-07T14:04:43.961Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo.ts"
+[2026-07-07T14:04:43.986Z] [FATAL] no reachable OpenAI-compatible LLM endpoint on http://127.0.0.1:8080/v1 or http://127.0.0.1:8000/v1 (checked /models)
+[2026-07-07T14:04:43.986Z] [FAIL] swarm loop aborted — LLM endpoint unavailable
+[2026-07-07T14:06:27.963Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo2.ts"
+[2026-07-07T14:06:27.963Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo2.ts"
+[2026-07-07T14:06:28.002Z] [FATAL] no reachable OpenAI-compatible LLM endpoint on http://127.0.0.1:8080/v1 or http://127.0.0.1:8000/v1 (checked /models)
+[2026-07-07T14:06:28.002Z] [FATAL] no reachable OpenAI-compatible LLM endpoint on http://127.0.0.1:8080/v1 or http://127.0.0.1:8000/v1 (checked /models)
+[2026-07-07T14:06:28.002Z] [FAIL] swarm loop aborted — LLM endpoint unavailable
+[2026-07-07T14:06:28.002Z] [FAIL] swarm loop aborted — LLM endpoint unavailable
+[2026-07-07T14:09:05.875Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo4.ts"
+[2026-07-07T14:09:05.914Z] [FATAL] no reachable OpenAI-compatible LLM endpoint on http://127.0.0.1:8080/v1 or http://127.0.0.1:8000/v1 (checked /models)
+[2026-07-07T14:09:05.914Z] [FAIL] swarm loop aborted — LLM endpoint unavailable
+[2026-07-07T14:09:17.532Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo.ts"
+[2026-07-07T14:09:17.559Z] [FATAL] no reachable OpenAI-compatible LLM endpoint on http://127.0.0.1:8080/v1 or http://127.0.0.1:8000/v1 (checked /models)
+[2026-07-07T14:09:17.560Z] [FAIL] swarm loop aborted — LLM endpoint unavailable
+[2026-07-07T14:10:06.525Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo.ts"
+[2026-07-07T14:10:06.547Z] [INFO] LLM endpoint=http://127.0.0.1:8080/v1 model=mock-qwen-test
+[2026-07-07T14:10:06.548Z] [ATTEMPT] #1/5
+[2026-07-07T14:10:06.553Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:10:08.961Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:10:08.962Z] [ATTEMPT] #2/5
+[2026-07-07T14:10:08.965Z] [WRITE] wrote 71 bytes to app/generated/demo.ts
+[2026-07-07T14:10:11.201Z] [TSC_OK] npx tsc --noEmit passed
+[2026-07-07T14:10:11.201Z] [DONE] deployment-ready
+[2026-07-07T14:11:18.394Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo.ts"
+[2026-07-07T14:11:18.416Z] [INFO] LLM endpoint=http://127.0.0.1:8080/v1 model=mock-always-broken
+[2026-07-07T14:11:18.418Z] [INFO] backed up existing file to app/generated/demo.ts.swarm-backup
+[2026-07-07T14:11:18.418Z] [ATTEMPT] #1/5
+[2026-07-07T14:11:18.423Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:11:20.754Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:11:20.755Z] [ATTEMPT] #2/5
+[2026-07-07T14:11:20.758Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:11:23.153Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:11:23.154Z] [ATTEMPT] #3/5
+[2026-07-07T14:11:23.159Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:11:25.339Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:11:25.339Z] [ATTEMPT] #4/5
+[2026-07-07T14:11:25.343Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:11:27.662Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:11:27.662Z] [ATTEMPT] #5/5
+[2026-07-07T14:11:27.666Z] [WRITE] wrote 68 bytes to app/generated/demo.ts
+[2026-07-07T14:11:29.999Z] [TSC_FAIL] app/generated/demo.ts(1,66): error TS1005: ')' expected.
+
+[2026-07-07T14:11:30.001Z] [RESTORE] restored original file after failed attempts (app/generated/demo.ts)
+[2026-07-07T14:11:30.002Z] [FAIL] swarm loop failed after 5 attempts
