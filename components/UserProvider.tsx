@@ -37,6 +37,23 @@ type UserCtx = {
 const Ctx = createContext<UserCtx | null>(null);
 const STORAGE_KEY = 'edenclaw_email';
 
+async function readJsonSafely(res: Response): Promise<Record<string, unknown>> {
+  const text = await res.text().catch(() => '');
+  if (!text.trim()) return {};
+  try {
+    const parsed = JSON.parse(text);
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
+  } catch {
+    return { error: text.slice(0, 500) || 'invalid_json_response' };
+  }
+}
+
+function unwrapQuotaPayload(json: Record<string, unknown>): Quota | null {
+  const nested = json.quota;
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) return nested as Quota;
+  return typeof json.remaining === 'number' && typeof json.allocated === 'number' ? json as unknown as Quota : null;
+}
+
 export function useUser(): UserCtx {
   const c = useContext(Ctx);
   if (!c) throw new Error('useUser must be used within <UserProvider>');
@@ -57,13 +74,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setError('');
     try {
       const res = await fetch(`/api/trading/quota?email=${encodeURIComponent(target)}`);
-      const json = await res.json();
+      const json = await readJsonSafely(res);
       if (!res.ok) {
-        setError(json.error ?? `조회 실패 (${res.status})`);
+        setError(typeof json.error === 'string' ? json.error : `조회 실패 (${res.status})`);
+        return false;
+      }
+      const nextQuota = unwrapQuotaPayload(json);
+      if (!nextQuota) {
+        setError('쿼터 응답 형식이 올바르지 않습니다.');
         return false;
       }
       setEmail(target);
-      setQuotaState(json as Quota);
+      setQuotaState(nextQuota);
       try { localStorage.setItem(STORAGE_KEY, target); } catch {}
       return true;
     } catch (e) {
