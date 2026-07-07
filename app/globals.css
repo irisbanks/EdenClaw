@@ -3,17 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --muted: 214 32% 93%;
-  --muted-foreground: 215 16% 44%;
-  --border: 214 32% 87%;
-  --input: 214 32% 87%;
-  --ring: 217 91% 60%;
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
+  /* 헤지펀드/금융 단말기 톤: 완전한 블랙 배경 + 퓨어 화이트 텍스트 + 사파이어 블루 단일 강조색 */
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 60%;
+  --border: 240 4% 16%;
+  --input: 240 4% 16%;
+  --ring: 221 100% 50%;
+  --primary: 221 100% 50%;
+  --primary-foreground: 0 0% 100%;
 }
 
 html {
