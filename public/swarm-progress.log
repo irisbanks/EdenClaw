@@ -49,3 +49,15 @@
 
 [2026-07-07T14:11:30.001Z] [RESTORE] restored original file after failed attempts (app/generated/demo.ts)
 [2026-07-07T14:11:30.002Z] [FAIL] swarm loop failed after 5 attempts
+[2026-07-07T14:59:06.025Z] [START] task="현재 시간을 ISO 문자열로 반환하는 유틸 함수" target="app/generated/demo.ts"
+[2026-07-07T14:59:06.047Z] [INFO] LLM endpoint=http://127.0.0.1:8080/v1 model=swarm-coder
+[2026-07-07T14:59:06.048Z] [ATTEMPT] #1/5
+[2026-07-07T14:59:06.374Z] [WRITE] wrote 82 bytes to app/generated/demo.ts
+[2026-07-07T14:59:09.138Z] [TSC_OK] npx tsc --noEmit passed
+[2026-07-07T14:59:09.138Z] [DONE] deployment-ready
+[2026-07-07T20:39:24.881Z] [START] task="두 숫자를 더하는 유틸 함수" target="app/generated/add.ts"
+[2026-07-07T20:39:24.882Z] [INFO] LLM endpoint=http://127.0.0.1:8080/v1 model=swarm-coder
+[2026-07-07T20:39:24.882Z] [ATTEMPT] #1/5
+[2026-07-07T20:39:25.557Z] [WRITE] wrote 62 bytes to app/generated/add.ts
+[2026-07-07T20:39:32.455Z] [TSC_OK] npx tsc --noEmit passed
+[2026-07-07T20:39:32.455Z] [DONE] deployment-ready

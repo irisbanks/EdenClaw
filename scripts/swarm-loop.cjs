@@ -18,6 +18,34 @@ const { spawnSync } = require('node:child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const LOG_PATH = path.join(PROJECT_ROOT, 'public', 'swarm-progress.log');
+
+// 이 스크립트는 Next.js 밖에서 plain node로도 실행되므로(직접 CLI 호출), .env/
+// .env.local을 직접 읽는다. dotenv는 프로젝트에 선언된 의존성이 아니라(전이
+// 의존성으로만 존재) 새 패키지를 추가하는 대신 최소 파서로 처리한다.
+// .env.local이 .env보다 우선한다(Next.js와 동일한 우선순위).
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+}
+// loadEnvFile은 이미 process.env에 있는 키를 덮어쓰지 않으므로(first-wins),
+// 더 높은 우선순위인 .env.local을 먼저 읽어야 한다.
+loadEnvFile(path.join(PROJECT_ROOT, '.env.local'));
+loadEnvFile(path.join(PROJECT_ROOT, '.env'));
 const MAX_ATTEMPTS = 5;
 const ALLOWED_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.css']);
 const CANDIDATE_LLM_BASES = ['http://127.0.0.1:8080/v1', 'http://127.0.0.1:8000/v1'];
@@ -53,18 +81,30 @@ function validateTargetPath(rawTargetPath) {
   return absoluteTarget;
 }
 
+async function probeModel(base) {
+  try {
+    const res = await fetch(`${base}/models`, { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const first = Array.isArray(data && data.data) ? data.data[0] : null;
+    return first && typeof first.id === 'string' ? first.id : null;
+  } catch {
+    return null;
+  }
+}
+
 async function detectLlmEndpoint() {
+  // SWARM_LLM_URL/SWARM_LLM_MODEL(.env.local)이 있으면 자동탐지보다 우선한다.
+  const envUrl = process.env.SWARM_LLM_URL;
+  if (envUrl) {
+    const base = envUrl.replace(/\/chat\/completions\/?$/, '');
+    const model = process.env.SWARM_LLM_MODEL || (await probeModel(base));
+    if (model) return { base, model };
+  }
+
   for (const base of CANDIDATE_LLM_BASES) {
-    try {
-      const res = await fetch(`${base}/models`, { signal: AbortSignal.timeout(3000) });
-      if (!res.ok) continue;
-      const data = await res.json();
-      const first = Array.isArray(data && data.data) ? data.data[0] : null;
-      const model = first && typeof first.id === 'string' ? first.id : null;
-      if (model) return { base, model };
-    } catch {
-      // try next candidate
-    }
+    const model = await probeModel(base);
+    if (model) return { base, model };
   }
   return null;
 }
