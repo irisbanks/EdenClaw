@@ -1,3 +1,4 @@
+import { after } from 'next/server';
 import { propagateAndSettle } from '@/lib/services/binarySettlement';
 
 export interface SettlementJob {
@@ -14,8 +15,14 @@ export interface SettlementJob {
  * 토큰 소비/결제 응답을 막지 않도록 전파·정산을 백그라운드로 넘기고,
  * 단일 워커가 FIFO 로 "순차" 처리하여 LegBalance 동시 갱신 경합을 제거한다.
  *
- * 주의: 장기 실행 Node 서버(next start)를 전제로 한다. 다중 인스턴스/서버리스
- * 환경으로 확장 시 Redis Streams/BullMQ 등 외부 큐로 교체할 것.
+ * Vercel 서버리스에서는 응답을 보낸 직후 인스턴스가 곧바로 얼 수 있어, 단순
+ * `void promise.then(drain)` 방식은 드레인이 끝나기 전에 죽어 정산이 조용히
+ * 유실될 수 있었다. `next/server`의 `after()`로 감싸 플랫폼이 드레인 완료까지
+ * 인스턴스를 살려두도록 보장한다(요청 흐름은 그대로 논블로킹).
+ *
+ * 다중 인스턴스 간 큐 자체를 공유하진 않는다 — 각 인스턴스는 자신이 적재한
+ * 작업만 자신의 after() 구간에서 끝까지 드레인한다. 진짜 크로스 인스턴스 큐가
+ * 필요해지면 Redis Streams/BullMQ 등 외부 큐로 교체할 것.
  * (핫리로드 중복 방지를 위해 globalThis 에 싱글톤 보관)
  */
 interface QueueState {
@@ -52,8 +59,15 @@ async function drain(): Promise<void> {
 export function enqueueSettlement(job: Omit<SettlementJob, 'enqueuedAt'>): void {
   if (job.pv <= 0 && job.bv <= 0) return;
   state.jobs.push({ ...job, enqueuedAt: Date.now() });
-  // 다음 틱에 드레인 (현재 요청 흐름을 막지 않음)
-  void Promise.resolve().then(drain);
+  // 응답 이후에도 드레인이 끝날 때까지 인스턴스를 살려두도록 플랫폼에 위임
+  // (요청을 만든 유저 입장에서는 여전히 논블로킹).
+  try {
+    after(drain);
+  } catch {
+    // after()는 요청 스코프 밖(예: 스크립트/테스트)에서 호출되면 던진다 —
+    // 그런 컨텍스트에서는 다음 틱 드레인으로 폴백.
+    void Promise.resolve().then(drain);
+  }
 }
 
 export function getQueueStats() {

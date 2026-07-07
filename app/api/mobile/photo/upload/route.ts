@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
+import { put } from '@vercel/blob';
 import { prisma } from '@/lib/prisma';
 import { detectPrivateInfo } from '@/lib/vision/detect-private-info';
 
@@ -47,13 +48,40 @@ export async function POST(req: NextRequest) {
 
     const ext = extensionFromMime(upload.mimeType);
     const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true });
-    const storagePath = path.join(uploadDir, fileName);
-    await writeFile(storagePath, upload.buffer);
 
-    const url = `/uploads/${fileName}`;
-    const privateInfo = await detectPrivateInfo({ imageUrl: url });
+    // 저장 우선순위:
+    // 1) Vercel Blob (BLOB_READ_WRITE_TOKEN 있으면) — 서버리스에서도 영구 저장, 대량 사용자 규모에 맞는 유일한 옵션.
+    // 2) 로컬 디스크 (개발용 next start/dev — Vercel 서버리스는 읽기 전용 FS라 여기서 항상 실패한다).
+    // 3) Base64 data URL — 위 둘 다 안 될 때만 쓰는 최후 폴백. Postgres row 에 이미지 전체가
+    //    박히므로 실사용 규모에서는 DB 비대화/응답 지연의 원인이 된다 — 반드시 1)을 설정할 것.
+    let url: string;
+    let storagePath = '';
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(`product-photos/${fileName}`, upload.buffer, {
+        access: 'public',
+        contentType: upload.mimeType,
+      });
+      url = blob.url;
+      storagePath = blob.pathname;
+    } else {
+      url = `/uploads/${fileName}`;
+      storagePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      try {
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        await mkdir(uploadDir, { recursive: true });
+        await writeFile(storagePath, upload.buffer);
+      } catch {
+        console.warn(
+          '[photo/upload] BLOB_READ_WRITE_TOKEN 미설정 + 디스크 쓰기 실패 → base64 data URL 폴백 ' +
+            '(프로덕션 규모에서는 Vercel Blob storage 를 반드시 연결할 것)',
+        );
+        url = `data:${upload.mimeType};base64,${upload.buffer.toString('base64')}`;
+        storagePath = '';
+      }
+    }
+
+    // data URL 폴백 시 외부 패치를 시도하는 탐지기가 던질 수 있어 가드(실패해도 업로드는 진행)
+    const privateInfo = await detectPrivateInfo({ imageUrl: url }).catch(() => ({ flags: [] as unknown[] }));
     const draft = await prisma.productDraft.create({
       data: {
         userId: upload.userId || null,

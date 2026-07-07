@@ -1,0 +1,30 @@
+# --- 빌드 산출/의존성/로그 (스펙 필수 3종 포함) ---
+.next
+.next-dev
+node_modules
+*.log
+.env*
+public/uploads
+
+# --- 대용량 ML 산출물/백업 (Vercel 업로드 폭증 → Upload aborted 원인). 웹앱 빌드에 불필요 ---
+models
+backup-2026-05-02
+backup-*
+.git
+
+# 모델 가중치 확장자(어디에 있든 업로드 차단)
+*.safetensors
+*.bin
+*.gguf
+*.pt
+*.ckpt
+*.onnx
+
+# --- RAG/데이터/로컬DB (Vercel 서버리스에서 못 쓰는 대용량, 업로드만 폭증) ---
+data
+*.npy
+*.db
+finetune/adapters
+public/downloads
+public/downloads
+public/downloads

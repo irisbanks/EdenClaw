@@ -6,7 +6,9 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
-    path: "prisma/migrations",
+    // 기존 prisma/migrations 는 SQLite 개발 이력으로 보존한다.
+    // 실제 Supabase PostgreSQL 배포는 provider가 일치하는 이 경로만 사용한다.
+    path: "prisma/migrations-postgresql",
   },
   datasource: {
     url: process.env["DATABASE_URL"],

@@ -1,0 +1,22 @@
+{{- bos_token -}}
+{%- set ns = namespace(system='') -%}
+{%- if messages and messages[0]['role'] == 'system' -%}
+  {%- set ns.system = messages[0]['content'] | trim -%}
+  {%- set turns = messages[1:] -%}
+{%- else -%}
+  {%- set turns = messages -%}
+{%- endif -%}
+{%- for message in turns -%}
+  {%- if (message['role'] == 'user') != (loop.index0 % 2 == 0) -%}
+    {{- raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') -}}
+  {%- endif -%}
+  {%- set role = 'model' if message['role'] == 'assistant' else message['role'] -%}
+  {%- set content = message['content'] | trim -%}
+  {%- if loop.first and ns.system -%}
+    {%- set content = ns.system + '\n\n' + content -%}
+  {%- endif -%}
+  {{- '<start_of_turn>' + role + '\n' + content + '<end_of_turn>\n' -}}
+{%- endfor -%}
+{%- if add_generation_prompt -%}
+  {{- '<start_of_turn>model\n' -}}
+{%- endif -%}

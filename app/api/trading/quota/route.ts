@@ -1,65 +1,74 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { loadGasAccountByEmail, quotaView, executeOverdraftLedgerSwap } from '@/lib/services/overdraftLedger';
 
-const DEFAULT_QUOTA = BigInt(2_000_000);
-const ZERO_QUOTA = BigInt(0);
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const DEFAULT_ALLOCATION = BigInt(2_000_000);
+const ZERO = BigInt(0);
+
+/**
+ * 대시보드/UserProvider가 폴링하는 읽기 전용 쿼터 조회.
+ * 이전에는 GET 핸들러 자체가 없어 프론트가 항상 405 를 받았다.
+ */
+export async function GET(req: NextRequest) {
+  const email = req.nextUrl.searchParams.get('email')?.trim();
+  if (!email) return NextResponse.json({ error: 'email 이 필요합니다.' }, { status: 400 });
+
+  const account = await loadGasAccountByEmail(email);
+  if (!account || !account.tokenQuota) {
+    return NextResponse.json({ error: '가입되지 않은 이메일이거나 쿼터가 없습니다.' }, { status: 404 });
+  }
+  return NextResponse.json(quotaView(account));
+}
 
 export async function POST(req: Request) {
   try {
-    // 1. 요청 본문 및 사용자 세션 확인 (안전 파싱)
     const body = await req.json().catch(() => ({}));
-    const userId = body.userId || 'system_user';
+    const email = typeof body.email === 'string' ? body.email.trim() : '';
+    const action = body.action;
+    if (!email) return NextResponse.json({ error: 'email 이 필요합니다.' }, { status: 400 });
 
-    console.log(`[Quota Router] Processing transaction for user: ${userId}`);
+    const account = await loadGasAccountByEmail(email);
+    if (!account || !account.tokenQuota) {
+      return NextResponse.json({ error: '가입되지 않은 이메일이거나 쿼터가 없습니다.' }, { status: 404 });
+    }
 
-    // 2. 409 Conflict 및 데드락 방지를 위한 Upsert (낙관적 락 가드)
-    // 데이터베이스 충돌이 나더라도 에러를 뱉지 않고 강제 동기화 갱신을 수행합니다.
-    const quotaResult = await prisma.tokenQuota.upsert({
-      where: {
-        userId,
-      },
-      update: {
-        // 가스 오버드래프트 소진 상태를 강제로 정상 범위로 복구 및 유지
-        allocated: DEFAULT_QUOTA,
-        consumed: ZERO_QUOTA,
-      },
-      create: {
-        userId,
-        allocated: DEFAULT_QUOTA,
-        consumed: ZERO_QUOTA,
-      },
-      select: {
-        userId: true,
-        allocated: true,
-        consumed: true,
-      },
-    }).then((quota) => ({
-      userId: quota.userId,
-      totalQuota: Number(quota.allocated),
-      remainingGas: Number(quota.allocated - quota.consumed),
-      usedRate: quota.allocated > ZERO_QUOTA ? Number(quota.consumed) / Number(quota.allocated) : 0,
-      status: 'SYNCED',
-    })).catch((dbError: unknown) => {
-      // DB가 완전히 락이 걸렸을 경우 크래시를 방지하기 위한 폴백 가드
-      console.error('[Quota Fallback Engine Activated]:', dbError);
-      return { userId, remainingGas: Number(DEFAULT_QUOTA), status: 'MOCK_SUCCESS' };
-    });
+    if (action === 'overdraft') {
+      const result = await executeOverdraftLedgerSwap(account.id);
+      if (!result.ok) {
+        return NextResponse.json(
+          { error: result.message, code: result.code, quota: result.quota },
+          { status: result.code === 'ALREADY_ADVANCED' ? 409 : 400 },
+        );
+      }
+      return NextResponse.json({
+        ...result.quota,
+        swapped: result.swappedGas,
+        mode: result.mode,
+      });
+    }
 
-    // 3. 409 에러 대신 무조건 200 OK를 반환하여 프론트엔드 대시보드와 차트 마비를 차단
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Quota lock-guard synchronized successfully.',
-      data: quotaResult
-    }, { status: 200 });
+    if (action === 'reset') {
+      // 데모/샌드박스 세션 리셋 — action='reset' 을 명시적으로 요청했을 때만
+      // 기본 쿼터로 되돌린다.
+      //
+      // 이전 구현은 action 값을 아예 읽지 않고, 이 라우트가 호출되기만 하면
+      // (조회든 오버드래프트든 무관하게) 매번 upsert 로 allocated=2,000,000 /
+      // consumed=0 을 강제 기록했다 — 대시보드가 GET 조회만 해도 실사용자
+      // 쿼터가 매번 무료로 리셋되는 과금 우회 버그였다.
+      await prisma.tokenQuota.update({
+        where: { userId: account.id },
+        data: { allocated: DEFAULT_ALLOCATION, consumed: ZERO },
+      });
+      const fresh = await loadGasAccountByEmail(email);
+      return NextResponse.json(quotaView(fresh!));
+    }
 
-  } catch (globalError) {
-    console.error('[Quota Router Critical Error Handled]:', globalError);
-    
-    // 어떤 최악의 상황에서도 실시간 시그널과 수당 판넬이 멈추지 않도록 무조건 성공 응답 리턴
-    return NextResponse.json({ 
-      success: true, 
-      fallback: true,
-      remainingGas: 2000000 
-    }, { status: 200 });
+    return NextResponse.json({ error: `알 수 없는 action: ${String(action)}` }, { status: 400 });
+  } catch (error) {
+    console.error('[trading/quota]', error);
+    return NextResponse.json({ error: '처리 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }

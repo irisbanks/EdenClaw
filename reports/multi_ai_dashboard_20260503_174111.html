@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edenclaw Multi AI Dashboard</title>
+  <style>
+    body { margin:0; background:#081018; color:#e7eef7; font-family:Arial,sans-serif; }
+    main { max-width:1220px; margin:0 auto; padding:32px 20px 60px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    h2 { margin:30px 0 12px; font-size:20px; }
+    .muted { color:#8fa2b8; }
+    .case { border:1px solid #233348; background:#101a26; border-radius:8px; margin-top:16px; overflow:hidden; }
+    .caseHead { padding:14px 16px; border-bottom:1px solid #233348; display:flex; justify-content:space-between; gap:16px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px 12px; border-bottom:1px solid #1f2e42; text-align:left; vertical-align:top; }
+    th { color:#9fb0c4; font-size:12px; text-transform:uppercase; }
+    .barTrack { width:150px; height:9px; background:#172235; border-radius:999px; overflow:hidden; display:inline-block; vertical-align:middle; }
+    .bar { height:100%; background:#60a5fa; }
+    .winner { color:#86efac; font-weight:800; }
+    .err { color:#fca5a5; font-size:12px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px; }
+    .card { border:1px solid #233348; background:#101a26; border-radius:8px; padding:14px; }
+  </style>
+</head>
+<body><main>
+  <h1>Edenclaw Multi AI 비교 대시보드</h1>
+  <div class="muted">5개 시나리오 실제 실행 결과 · 그래프는 종합 점수 기준</div>
+  <section class="case">
+  <div class="caseHead">
+    <div><strong>고가 상품</strong> <span class="muted">(buy)</span><br><span class="muted">iPhone 15 Pro Max 256GB 사고 싶어</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>2,456ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:64.3%"></span></span> 64.30</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>18,237ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00181</td>
+  <td><span class="barTrack"><span class="bar" style="width:56.63%"></span></span> 56.63</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-opus-4-5-20251101</span></td>
+  <td>7,058ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00343</td>
+  <td><span class="barTrack"><span class="bar" style="width:55.82%"></span></span> 55.82</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>8,501ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00244</td>
+  <td><span class="barTrack"><span class="bar" style="width:54.31%"></span></span> 54.31</td>
+  <td>api</td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>저가 상품</strong> <span class="muted">(buy)</span><br><span class="muted">USB 케이블 1m 가성비 좋은거</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,045ms</td>
+  <td>$5.09</td>
+  <td>11번가</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:57.21%"></span></span> 57.21</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-opus-4-5-20251101</span></td>
+  <td>7,196ms</td>
+  <td>$6.17</td>
+  <td>11번가</td>
+  <td>$0.00320</td>
+  <td><span class="barTrack"><span class="bar" style="width:41.28%"></span></span> 41.28</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>10,403ms</td>
+  <td>$8.24</td>
+  <td>11번가</td>
+  <td>$0.00223</td>
+  <td><span class="barTrack"><span class="bar" style="width:40.35%"></span></span> 40.35</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>1,286ms</td>
+  <td>$5.16</td>
+  <td>11번가</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:19.68%"></span></span> 19.68</td>
+  <td>local-fallback<br><span class='err'>Server error &#x27;503 Service Unavailable&#x27; for url &#x27;https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=A</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>협상</strong> <span class="muted">(negotiate)</span><br><span class="muted">MacBook Pro 16인치 중고 협상해줘</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,092ms</td>
+  <td>$0.00</td>
+  <td>중고마켓플레이스 (예: 당근마켓, 번개장터)</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:53.11%"></span></span> 53.11</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-opus-4-5-20251101</span></td>
+  <td>10,168ms</td>
+  <td>$0.00</td>
+  <td>당근마켓, 번개장터, 중고나라 (직접 검색 필요)</td>
+  <td>$0.00293</td>
+  <td><span class="barTrack"><span class="bar" style="width:26.55%"></span></span> 26.55</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>10,522ms</td>
+  <td>$0.00</td>
+  <td>당근마켓 또는 중고나라 직거래</td>
+  <td>$0.00222</td>
+  <td><span class="barTrack"><span class="bar" style="width:25.36%"></span></span> 25.36</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>723ms</td>
+  <td>$0.00</td>
+  <td>검증 필요</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:10.27%"></span></span> 10.27</td>
+  <td>local-fallback<br><span class='err'>Server error &#x27;503 Service Unavailable&#x27; for url &#x27;https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=A</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>매도</strong> <span class="muted">(sell)</span><br><span class="muted">내가 가진 iPad Pro 팔고 싶어</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,118ms</td>
+  <td>$124.99</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:89.74%"></span></span> 89.74</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>10,441ms</td>
+  <td>$100.00</td>
+  <td>당근마켓</td>
+  <td>$0.00250</td>
+  <td><span class="barTrack"><span class="bar" style="width:64.39%"></span></span> 64.39</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-opus-4-5-20251101</span></td>
+  <td>9,066ms</td>
+  <td>$88.19</td>
+  <td>Newegg</td>
+  <td>$0.00357</td>
+  <td><span class="barTrack"><span class="bar" style="width:53.65%"></span></span> 53.65</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>27,040ms</td>
+  <td>$108.54</td>
+  <td>당근마켓 (Daangn Market)</td>
+  <td>$0.00229</td>
+  <td><span class="barTrack"><span class="bar" style="width:50.6%"></span></span> 50.60</td>
+  <td>api</td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>차익거래</strong> <span class="muted">(arbitrage)</span><br><span class="muted">100달러 예산으로 차익거래 가능한 상품 찾아줘</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>2,859ms</td>
+  <td>$7,715.63</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:86.0%"></span></span> 86.00</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>10,841ms</td>
+  <td>$8,811.67</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00153</td>
+  <td><span class="barTrack"><span class="bar" style="width:36.06%"></span></span> 36.06</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>6,563ms</td>
+  <td>$8,811.67</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00255</td>
+  <td><span class="barTrack"><span class="bar" style="width:28.07%"></span></span> 28.07</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-opus-4-5-20251101</span></td>
+  <td>9,026ms</td>
+  <td>$100.00</td>
+  <td>해당없음</td>
+  <td>$0.00364</td>
+  <td><span class="barTrack"><span class="bar" style="width:7.12%"></span></span> 7.12</td>
+  <td>api</td>
+</tr></tbody>
+  </table>
+</section>
+  <h2>AI별 강점/약점</h2>
+  <table><thead><tr><th>AI</th><th>우승 횟수</th><th>평균 점수</th><th>분석</th></tr></thead><tbody><tr><td>Edenclaw AI</td><td>5</td><td>70.07</td><td>로컬 DB와 vLLM에 가장 잘 붙어 실거래 후보 검색에 강함. 외부 API 비용 없음.</td></tr>
+<tr><td>GPT-5.5</td><td>0</td><td>42.50</td><td>범용 추론과 가격 비교 설명에 강함. 키/모델 접근권이 없으면 fallback 처리.</td></tr>
+<tr><td>Claude</td><td>0</td><td>36.88</td><td>협상 문구와 리스크 설명에 적합. ANTHROPIC_API_KEY 설정 필요.</td></tr>
+<tr><td>Gemini</td><td>0</td><td>34.65</td><td>빠른 응답과 저렴한 단가가 장점. 무료/쿼터 제한 시 429가 날 수 있음.</td></tr></tbody></table>
+  <h2>비용 분석</h2>
+  <div class="muted">월 1,000건 가정: 요청당 입력 1,500 tokens + 출력 500 tokens</div>
+  <table><thead><tr><th>AI</th><th>Input / 1M</th><th>Output / 1M</th><th>건당 예상</th><th>월 1,000건</th><th>비고</th></tr></thead><tbody><tr>
+  <td>GPT-5.5</td>
+  <td>$5.00</td>
+  <td>$30.00</td>
+  <td>$0.02250</td>
+  <td>$22.50</td>
+  <td>OpenAI gpt-5.5 standard</td>
+</tr>
+<tr>
+  <td>GPT-4o</td>
+  <td>$2.50</td>
+  <td>$10.00</td>
+  <td>$0.00875</td>
+  <td>$8.75</td>
+  <td>OpenAI fallback</td>
+</tr>
+<tr>
+  <td>Claude</td>
+  <td>$5.00</td>
+  <td>$25.00</td>
+  <td>$0.02000</td>
+  <td>$20.00</td>
+  <td>Claude Opus 4.7/4.5 family</td>
+</tr>
+<tr>
+  <td>Gemini</td>
+  <td>$1.25</td>
+  <td>$10.00</td>
+  <td>$0.00688</td>
+  <td>$6.88</td>
+  <td>Gemini 2.5 Pro &lt;=200K prompt</td>
+</tr>
+<tr>
+  <td>Edenclaw AI</td>
+  <td>$0.00</td>
+  <td>$0.00</td>
+  <td>$0.00000</td>
+  <td>$0.00</td>
+  <td>self-hosted vLLM; excludes electricity</td>
+</tr></tbody></table>
+</main></body></html>

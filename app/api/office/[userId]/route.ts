@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { serializeLedgerTransaction } from '@/lib/services/ledgerSerialization';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -56,13 +57,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ use
       greaterLegPV, // 대실적
       carryForwardPV: greaterLegPV - lesserLegPV, // 이월 예정 볼륨
     },
-    transactions: transactions.map((t) => ({
-      id: t.id,
-      txType: t.txType,
-      amount: t.amount,
-      pvGenerated: t.pvGenerated,
-      bvGenerated: t.bvGenerated,
-      createdAt: t.createdAt,
-    })),
+    // 원화(KRW) 결제액이 EP/GAS 원장 흐름에 합산되지 않도록 통화 격리 직렬화.
+    transactions: transactions.map(serializeLedgerTransaction),
   });
 }

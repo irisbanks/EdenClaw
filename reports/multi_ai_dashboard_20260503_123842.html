@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edenclaw Multi AI Dashboard</title>
+  <style>
+    body { margin:0; background:#081018; color:#e7eef7; font-family:Arial,sans-serif; }
+    main { max-width:1220px; margin:0 auto; padding:32px 20px 60px; }
+    h1 { margin:0 0 8px; font-size:28px; }
+    h2 { margin:30px 0 12px; font-size:20px; }
+    .muted { color:#8fa2b8; }
+    .case { border:1px solid #233348; background:#101a26; border-radius:8px; margin-top:16px; overflow:hidden; }
+    .caseHead { padding:14px 16px; border-bottom:1px solid #233348; display:flex; justify-content:space-between; gap:16px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px 12px; border-bottom:1px solid #1f2e42; text-align:left; vertical-align:top; }
+    th { color:#9fb0c4; font-size:12px; text-transform:uppercase; }
+    .barTrack { width:150px; height:9px; background:#172235; border-radius:999px; overflow:hidden; display:inline-block; vertical-align:middle; }
+    .bar { height:100%; background:#60a5fa; }
+    .winner { color:#86efac; font-weight:800; }
+    .err { color:#fca5a5; font-size:12px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:16px; }
+    .card { border:1px solid #233348; background:#101a26; border-radius:8px; padding:14px; }
+  </style>
+</head>
+<body><main>
+  <h1>Edenclaw Multi AI 비교 대시보드</h1>
+  <div class="muted">5개 시나리오 실제 실행 결과 · 그래프는 종합 점수 기준</div>
+  <section class="case">
+  <div class="caseHead">
+    <div><strong>고가 상품</strong> <span class="muted">(buy)</span><br><span class="muted">iPhone 15 Pro Max 256GB 사고 싶어</span></div>
+    <div class="winner">Winner: Gemini</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Gemini <span class='winner'>WIN</span><br><span class="muted">gemini-2.5-pro</span></td>
+  <td>18,867ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00161</td>
+  <td><span class="barTrack"><span class="bar" style="width:50.72%"></span></span> 50.72</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Edenclaw AI<br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>2,597ms</td>
+  <td>$614.99</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:50.23%"></span></span> 50.23</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-3-5-sonnet-latest</span></td>
+  <td>0ms</td>
+  <td>$627.29</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:23.1%"></span></span> 23.10</td>
+  <td>local-fallback<br><span class='err'>ANTHROPIC_API_KEY is not configured</span></td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>1,196ms</td>
+  <td>$633.44</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:12.88%"></span></span> 12.88</td>
+  <td>local-fallback<br><span class='err'>Client error &#x27;429 Too Many Requests&#x27; for url &#x27;https://api.openai.com/v1/responses&#x27;
+For more information check: https://developer.mozilla.org</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>저가 상품</strong> <span class="muted">(buy)</span><br><span class="muted">USB 케이블 1m 가성비 좋은거</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,251ms</td>
+  <td>$5.09</td>
+  <td>11번가</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:51.14%"></span></span> 51.14</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>23,531ms</td>
+  <td>$6.25</td>
+  <td>11번가</td>
+  <td>$0.00159</td>
+  <td><span class="barTrack"><span class="bar" style="width:43.28%"></span></span> 43.28</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-3-5-sonnet-latest</span></td>
+  <td>0ms</td>
+  <td>$5.19</td>
+  <td>11번가</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:22.79%"></span></span> 22.79</td>
+  <td>local-fallback<br><span class='err'>ANTHROPIC_API_KEY is not configured</span></td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>829ms</td>
+  <td>$5.24</td>
+  <td>11번가</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:12.52%"></span></span> 12.52</td>
+  <td>local-fallback<br><span class='err'>Client error &#x27;429 Too Many Requests&#x27; for url &#x27;https://api.openai.com/v1/responses&#x27;
+For more information check: https://developer.mozilla.org</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>협상</strong> <span class="muted">(negotiate)</span><br><span class="muted">MacBook Pro 16인치 중고 협상해줘</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,242ms</td>
+  <td>$0.00</td>
+  <td>Naver Cafe, Craigslist, Facebook Marketplace</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:51.5%"></span></span> 51.50</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>16,984ms</td>
+  <td>$0.00</td>
+  <td>중고 거래 플랫폼 (당근마켓, 중고나라 등)</td>
+  <td>$0.00224</td>
+  <td><span class="barTrack"><span class="bar" style="width:23.3%"></span></span> 23.30</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-3-5-sonnet-latest</span></td>
+  <td>0ms</td>
+  <td>$0.00</td>
+  <td>검증 필요</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:17.24%"></span></span> 17.24</td>
+  <td>local-fallback<br><span class='err'>ANTHROPIC_API_KEY is not configured</span></td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>1,098ms</td>
+  <td>$0.00</td>
+  <td>검증 필요</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:7.57%"></span></span> 7.57</td>
+  <td>local-fallback<br><span class='err'>Client error &#x27;429 Too Many Requests&#x27; for url &#x27;https://api.openai.com/v1/responses&#x27;
+For more information check: https://developer.mozilla.org</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>매도</strong> <span class="muted">(sell)</span><br><span class="muted">내가 가진 iPad Pro 팔고 싶어</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>4,033ms</td>
+  <td>$124.99</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:77.8%"></span></span> 77.80</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>19,128ms</td>
+  <td>$101.76</td>
+  <td>당근마켓</td>
+  <td>$0.00235</td>
+  <td><span class="barTrack"><span class="bar" style="width:58.91%"></span></span> 58.91</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-3-5-sonnet-latest</span></td>
+  <td>0ms</td>
+  <td>$122.39</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:24.44%"></span></span> 24.44</td>
+  <td>local-fallback<br><span class='err'>ANTHROPIC_API_KEY is not configured</span></td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>806ms</td>
+  <td>$123.59</td>
+  <td>Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:14.99%"></span></span> 14.99</td>
+  <td>local-fallback<br><span class='err'>Client error &#x27;429 Too Many Requests&#x27; for url &#x27;https://api.openai.com/v1/responses&#x27;
+For more information check: https://developer.mozilla.org</span></td>
+</tr></tbody>
+  </table>
+</section>
+<section class="case">
+  <div class="caseHead">
+    <div><strong>차익거래</strong> <span class="muted">(arbitrage)</span><br><span class="muted">100달러 예산으로 차익거래 가능한 상품 찾아줘</span></div>
+    <div class="winner">Winner: Edenclaw AI</div>
+  </div>
+  <table>
+    <thead><tr><th>AI</th><th>응답 시간</th><th>가격</th><th>플랫폼</th><th>비용</th><th>종합 점수</th><th>상태</th></tr></thead>
+    <tbody><tr>
+  <td>Edenclaw AI <span class='winner'>WIN</span><br><span class="muted">Qwen/Qwen2.5-72B-Instruct</span></td>
+  <td>3,134ms</td>
+  <td>$7,715.63</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:73.11%"></span></span> 73.11</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>Claude<br><span class="muted">claude-3-5-sonnet-latest</span></td>
+  <td>0ms</td>
+  <td>$8,987.90</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:40.69%"></span></span> 40.69</td>
+  <td>local-fallback<br><span class='err'>ANTHROPIC_API_KEY is not configured</span></td>
+</tr>
+<tr>
+  <td>Gemini<br><span class="muted">gemini-2.5-pro</span></td>
+  <td>11,282ms</td>
+  <td>$8,811.67</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00158</td>
+  <td><span class="barTrack"><span class="bar" style="width:37.16%"></span></span> 37.16</td>
+  <td>api</td>
+</tr>
+<tr>
+  <td>GPT-5.5<br><span class="muted">gpt-5.5</span></td>
+  <td>742ms</td>
+  <td>$9,076.02</td>
+  <td>11번가 -&gt; Newegg</td>
+  <td>$0.00000</td>
+  <td><span class="barTrack"><span class="bar" style="width:31.24%"></span></span> 31.24</td>
+  <td>local-fallback<br><span class='err'>Client error &#x27;429 Too Many Requests&#x27; for url &#x27;https://api.openai.com/v1/responses&#x27;
+For more information check: https://developer.mozilla.org</span></td>
+</tr></tbody>
+  </table>
+</section>
+  <h2>AI별 강점/약점</h2>
+  <table><thead><tr><th>AI</th><th>우승 횟수</th><th>평균 점수</th><th>분석</th></tr></thead><tbody><tr><td>Edenclaw AI</td><td>4</td><td>60.76</td><td>로컬 DB와 vLLM에 가장 잘 붙어 실거래 후보 검색에 강함. 외부 API 비용 없음.</td></tr>
+<tr><td>Gemini</td><td>1</td><td>42.67</td><td>빠른 응답과 저렴한 단가가 장점. 무료/쿼터 제한 시 429가 날 수 있음.</td></tr>
+<tr><td>Claude</td><td>0</td><td>25.65</td><td>협상 문구와 리스크 설명에 적합. ANTHROPIC_API_KEY 설정 필요.</td></tr>
+<tr><td>GPT-5.5</td><td>0</td><td>15.84</td><td>범용 추론과 가격 비교 설명에 강함. 키/모델 접근권이 없으면 fallback 처리.</td></tr></tbody></table>
+  <h2>비용 분석</h2>
+  <div class="muted">월 1,000건 가정: 요청당 입력 1,500 tokens + 출력 500 tokens</div>
+  <table><thead><tr><th>AI</th><th>Input / 1M</th><th>Output / 1M</th><th>건당 예상</th><th>월 1,000건</th><th>비고</th></tr></thead><tbody><tr>
+  <td>OpenAI latest listed</td>
+  <td>$1.75</td>
+  <td>$14.00</td>
+  <td>$0.00962</td>
+  <td>$9.62</td>
+  <td>OpenAI pricing currently lists gpt-5.2; gpt-5.5 price not published on pricing page</td>
+</tr>
+<tr>
+  <td>GPT-4o</td>
+  <td>$2.50</td>
+  <td>$10.00</td>
+  <td>$0.00875</td>
+  <td>$8.75</td>
+  <td>OpenAI fallback</td>
+</tr>
+<tr>
+  <td>Claude</td>
+  <td>$5.00</td>
+  <td>$25.00</td>
+  <td>$0.02000</td>
+  <td>$20.00</td>
+  <td>Claude Opus 4.5</td>
+</tr>
+<tr>
+  <td>Gemini</td>
+  <td>$1.25</td>
+  <td>$10.00</td>
+  <td>$0.00688</td>
+  <td>$6.88</td>
+  <td>Gemini 2.5 Pro &lt;=200K prompt</td>
+</tr>
+<tr>
+  <td>Edenclaw AI</td>
+  <td>$0.00</td>
+  <td>$0.00</td>
+  <td>$0.00000</td>
+  <td>$0.00</td>
+  <td>self-hosted vLLM; excludes electricity</td>
+</tr></tbody></table>
+</main></body></html>

@@ -1,0 +1,2139 @@
+{
+  "generated_at": "2026-05-03T12:38:42.207760",
+  "dashboard_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_dashboard_20260503_123842.html",
+  "cases": [
+    {
+      "case": {
+        "name": "고가 상품",
+        "scenario": "buy",
+        "message": "iPhone 15 Pro Max 256GB 사고 싶어"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 13,
+        "task": {
+          "scenario": "buy",
+          "message": "iPhone 15 Pro Max 256GB 사고 싶어",
+          "product_name": "iPhone 15 Pro Max 256GB",
+          "budget": null,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "고가 상품",
+            "scenario": "buy"
+          }
+        },
+        "candidate_count": 10,
+        "candidates": [
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max 256GB - Blue Titanium (Good Condition) Unlocked",
+            "platform": "Newegg",
+            "price_usd": 614.99,
+            "source_id": "global_products:9206",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23M-0003-02MS0",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max - 256GB - Blue Titanium - Fully Unlocked - Good (Grade B)",
+            "platform": "Newegg",
+            "price_usd": 619.99,
+            "source_id": "global_products:9182",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23B-000A-01589",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max - 256GB - White Titanium - Fully Unlocked - Good (Grade B)",
+            "platform": "Newegg",
+            "price_usd": 619.99,
+            "source_id": "global_products:9183",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23B-000A-01459",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max 256GB Fully Unlocked - Black Titanium (Grade B+)",
+            "platform": "Newegg",
+            "price_usd": 639.99,
+            "source_id": "global_products:9192",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23B-000A-026F1",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max 256GB - White Titanium (Very Good Condition) Unlocked",
+            "platform": "Newegg",
+            "price_usd": 639.99,
+            "source_id": "global_products:9197",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23M-0003-02N65",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max, 256GB, Blue Titanium - Unlocked",
+            "platform": "Newegg",
+            "price_usd": 662.99,
+            "source_id": "global_products:9157",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23M-0003-02KT0",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max 256GB - Blue Titanium (Good Condition) Unlocked",
+            "platform": "Newegg",
+            "price_usd": 663.99,
+            "source_id": "global_products:9198",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23M-0003-02N62",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 Pro Max 256GB - Blue Titanium (Very Good Condition) Unlocked",
+            "platform": "Newegg",
+            "price_usd": 776.0,
+            "source_id": "global_products:9196",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/23M-0003-02P96",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 PRO MAX 256GB, Refurbished Unlocked Cell Phone, Black Titanium - Very Good Condition (Grade ",
+            "platform": "Newegg",
+            "price_usd": 789.0,
+            "source_id": "global_products:9113",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-iphone-15-pro-max-6-7-black-titanium/p/N82E16875113999",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPhone 15 PRO MAX 256GB, Refurbished Unlocked Cell Phone, Blue Titanium - Very Good Condition (Grade B",
+            "platform": "Newegg",
+            "price_usd": 795.99,
+            "source_id": "global_products:9111",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-iphone-15-pro-max-6-7-blue-titanium/p/N82E16875827009",
+            "confidence": 0.75
+          }
+        ],
+        "task_summary": {
+          "task_type": "buy",
+          "product": "iPhone 15 Pro Max 256GB",
+          "budget": null,
+          "best_local_price": 614.99,
+          "best_local_platform": "Newegg"
+        },
+        "comparison": {
+          "winner": "Gemini",
+          "winner_result": {
+            "agent": "Gemini",
+            "model": "gemini-2.5-pro",
+            "scenario": "buy",
+            "recommendation": "Newegg에서 $614.99에 판매 중인 'Good' 등급의 리퍼브 블루 티타늄 모델을 추천합니다. 현재 가장 저렴한 옵션입니다.",
+            "platform": "Newegg",
+            "price": 614.99,
+            "confidence": 90.0,
+            "fraud_risk": 10.0,
+            "negotiation_success": 0.0,
+            "expected_profit_rate": 8.0,
+            "details": "제시된 목록 중 가장 저렴한 아이폰 15 프로 맥스 256GB 모델입니다. 'Good' 등급의 리퍼브 제품이므로, 구매 전 판매자의 반품 정책을 확인하고 제품 수령 시 배터리 성능과 외관 상태를 꼼꼼히 검토하는 것이 중요합니다.",
+            "raw": "{\n  \"recommendation\": \"Newegg에서 $614.99에 판매 중인 'Good' 등급의 리퍼브 블루 티타늄 모델을 추천합니다. 현재 가장 저렴한 옵션입니다.\",\n  \"platform\": \"Newegg\",\n  \"price\": 614.99,\n  \"confidence\": 0.9,\n  \"fraud_risk\": 0.1,\n  \"negotiation_success\": 0.0,\n  \"expected_profit_rate\": 0.08,\n  \"details\": \"제시된 목록 중 가장 저렴한 아이폰 15 프로 맥스 256GB 모델입니다. 'Good' 등급의 리퍼브 제품이므로, 구매 전 판매자의 반품 정책을 확인하고 제품 수령 시 배터리 성능과 외관 상태를 꼼꼼히 검토하는 것이 중요합니다.\"\n}",
+            "latency_ms": 18866.783437728882,
+            "cost_usd": 0.0016125,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 100.0,
+              "response_speed": 0.01,
+              "negotiation_success": 0.0,
+              "trade_profit": 16.0,
+              "recommendation_accuracy": 90.0,
+              "fraud_avoidance": 90.0,
+              "total": 50.72,
+              "learning_bias": -2.64
+            }
+          },
+          "results": [
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "buy",
+              "recommendation": "Newegg에서 $614.99에 판매 중인 'Good' 등급의 리퍼브 블루 티타늄 모델을 추천합니다. 현재 가장 저렴한 옵션입니다.",
+              "platform": "Newegg",
+              "price": 614.99,
+              "confidence": 90.0,
+              "fraud_risk": 10.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 8.0,
+              "details": "제시된 목록 중 가장 저렴한 아이폰 15 프로 맥스 256GB 모델입니다. 'Good' 등급의 리퍼브 제품이므로, 구매 전 판매자의 반품 정책을 확인하고 제품 수령 시 배터리 성능과 외관 상태를 꼼꼼히 검토하는 것이 중요합니다.",
+              "raw": "{\n  \"recommendation\": \"Newegg에서 $614.99에 판매 중인 'Good' 등급의 리퍼브 블루 티타늄 모델을 추천합니다. 현재 가장 저렴한 옵션입니다.\",\n  \"platform\": \"Newegg\",\n  \"price\": 614.99,\n  \"confidence\": 0.9,\n  \"fraud_risk\": 0.1,\n  \"negotiation_success\": 0.0,\n  \"expected_profit_rate\": 0.08,\n  \"details\": \"제시된 목록 중 가장 저렴한 아이폰 15 프로 맥스 256GB 모델입니다. 'Good' 등급의 리퍼브 제품이므로, 구매 전 판매자의 반품 정책을 확인하고 제품 수령 시 배터리 성능과 외관 상태를 꼼꼼히 검토하는 것이 중요합니다.\"\n}",
+              "latency_ms": 18866.783437728882,
+              "cost_usd": 0.0016125,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.01,
+                "negotiation_success": 0.0,
+                "trade_profit": 16.0,
+                "recommendation_accuracy": 90.0,
+                "fraud_avoidance": 90.0,
+                "total": 50.72,
+                "learning_bias": -2.64
+              }
+            },
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "buy",
+              "recommendation": "iPhone 15 Pro Max 256GB 블루 티타늄 (좋은 상태)를 Newegg에서 구매하세요.",
+              "platform": "Newegg",
+              "price": 614.99,
+              "confidence": 85.0,
+              "fraud_risk": 5.0,
+              "negotiation_success": 10.0,
+              "expected_profit_rate": 0.0,
+              "details": "가장 저렴한 옵션으로, 상태가 '좋음'으로 표시되어 있어 가격 대비 성능이 우수합니다. 구매 전에 판매자의 평가와 리뷰를 확인하고, 제품의 실제 상태를 사진으로 확인하세요.",
+              "raw": "{\n  \"recommendation\": \"iPhone 15 Pro Max 256GB 블루 티타늄 (좋은 상태)를 Newegg에서 구매하세요.\",\n  \"platform\": \"Newegg\",\n  \"price\": 614.99,\n  \"confidence\": 85,\n  \"fraud_risk\": 5,\n  \"negotiation_success\": 10,\n  \"expected_profit_rate\": 0,\n  \"details\": \"가장 저렴한 옵션으로, 상태가 '좋음'으로 표시되어 있어 가격 대비 성능이 우수합니다. 구매 전에 판매자의 평가와 리뷰를 확인하고, 제품의 실제 상태를 사진으로 확인하세요.\"\n}",
+              "latency_ms": 2596.8816142082214,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.04,
+                "negotiation_success": 10.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 85.0,
+                "fraud_avoidance": 95.0,
+                "total": 50.23,
+                "learning_bias": -1.98
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "buy",
+              "recommendation": "REFURBISHED Apple iPhone 15 Pro Max 256GB - Blue Titanium (Good Condition) Unlocked 후보가 현재 로컬 데이터에서 가장 경쟁력 있습니다.",
+              "platform": "Newegg",
+              "price": 627.29,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.02805185317993164,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.04,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 23.1,
+                "learning_bias": -1.37
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "buy",
+              "recommendation": "REFURBISHED Apple iPhone 15 Pro Max 256GB - Blue Titanium (Good Condition) Unlocked 후보가 현재 로컬 데이터에서 가장 경쟁력 있습니다.",
+              "platform": "Newegg",
+              "price": 633.44,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 1195.8272938728333,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 97.09,
+                "response_speed": 0.08,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 12.88,
+                "learning_bias": -1.71
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 614.99,
+            "max_price": 633.44,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123730.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 10,
+            "avg_score": 53.089,
+            "avg_latency_ms": 0.022838401794433593,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 10,
+            "avg_score": 50.407,
+            "avg_latency_ms": 2526.426184129715,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.6
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 10,
+            "avg_score": 49.098,
+            "avg_latency_ms": 552.4608100414276,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 46.9,
+            "avg_latency_ms": 3271.6200914382935,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 70.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 10,
+            "avg_score": 44.571000000000005,
+            "avg_latency_ms": 4166.692050790787,
+            "avg_cost_usd": 0.000200125,
+            "avg_fraud_avoidance": 77.4
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 42.03,
+            "avg_latency_ms": 0.02998495101928711,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.016644954681396484,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.0989990234375,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 32.15,
+            "avg_latency_ms": 1421.886459827423,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 31.18,
+            "avg_latency_ms": 11019.577722072601,
+            "avg_cost_usd": 0.000195,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 30.24,
+            "avg_latency_ms": 716.8014168739319,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 30.23,
+            "avg_latency_ms": 1057.981517314911,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 28.63,
+            "avg_latency_ms": 9841.525187969208,
+            "avg_cost_usd": 0.00060125,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 28.62,
+            "avg_latency_ms": 10459.235706806183,
+            "avg_cost_usd": 0.00019625,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 14.44,
+            "avg_latency_ms": 3487.3983192443848,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 99.9
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 14.01,
+            "avg_latency_ms": 2529.1549620628357,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 100.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "저가 상품",
+        "scenario": "buy",
+        "message": "USB 케이블 1m 가성비 좋은거"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 14,
+        "task": {
+          "scenario": "buy",
+          "message": "USB 케이블 1m 가성비 좋은거",
+          "product_name": "USB 케이블 1m 가성비 좋은거",
+          "budget": null,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "저가 상품",
+            "scenario": "buy"
+          }
+        },
+        "candidate_count": 10,
+        "candidates": [
+          {
+            "name": "아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m",
+            "platform": "11번가",
+            "price_usd": 5.087953760676223,
+            "source_id": "products:68152",
+            "seller": "AYA",
+            "url": "https://action.adoffice.11st.co.kr/act/click/v1/landing/clickdata/compress?clickData=HPk3tdlJ5FVDuy1rR787Z1kFpoU9JGqIJLZlbF1pqXxXTjPNOoyJDHe_tDwG3Q-H62jMlWGj_6wPkupGanj06cLDN57b4RfOwzG47SvB4CLWgKV0J8XX7CkwqQP8HVfYfBgtexQkzhfB3s29YgUob2dnDyEPbW9oVmtdqpF5-HXUTY7zr1Qs9ZTTAgEw5S1lPF9ZBz-4HBzt8hj5L3bUjJL6pr3TxXKkeUVvRH3ihyU-LGY4lIF1tlLJ2Kfwyo8r4HVvDiOidCzrIuzunwr50bWaOtc2r4RYXXsZ3A2q_3Tf9NKxGVHPhejttIITwQqhALVP3RmlaHyN3P0IJLVk1sJtOrjQK5B3IG5Z3GiJ15SlqMM7fiexiZOuiKYgvoxCL-HJEeVx1RZXpql7NyMsQIMkMvKyFJORcrq7360_8dTNca_Uzx5pzCHthPAv64XpCX_YXLRN506CtiOH295_mIggZyZfRxq9A1PEBYlNxi95dmJ_GLPMOnfLaHYLdBeqOTcPA3EsQf9r4RdnjPlsQWRi6q5iibV9TPsgx_w2OP3GomVSZ1Cau0wwpf1nrDx7BwCC6tGalvZcG7ydprGKbThdCEVdQIdG6gjkUOqq3VecJGSWQ3tfqIdoG5c70fEgFYO2KsCYTXNkmzWM8wsM512hCyMzee3sptdOJqnJzOHvVCbEpdmlU_l7TskBkAnjOWi39C632Tba_Z9N7jSwBw-dm8YEFMec-xYpJtDoWv8mbViDyulkSWt8pCCoUtM-vBzpXoz3aeki5iKIR-Q6trau_xx0gCdOKvXRFd7lwMrexFAUfZwoXLxHt_BoyBSulY4BkLsm08MlzEl0EuXI6KSdNXzIb3Odd7U325T_VyzEYDE63ChnAmbXNIScPE-GZWdL5TO7Ug8f8stauoU3EHbZvY0ra1WItPLntOLpK4TYg2wkC_1RTBhQI2nqhuD5NP90OGM915ZLaYk23DT5fqjapg-59-jCpqTv29l7Ox8wvCHOjFYKJL_52-yFoqHvxd9J1LWcHIgEeH0Wmmr6QUV0AMeaiOMbxTtt9B-pRRRV83KYKX8VkklnvP-Gx_nvPZ8VKJ0pfRuAb_Rsm2rTFhHljaIxMXBMbxaeGJZvMF_cYw1gGBS5i_BvdOdg64llDFVZc41JULOFaUzyvFQOxYkN3dNCeLsxcPkeD17BSNrofI1DMfoYLJfFzPulfsav&redirect=https%3A%2F%2Fwww.11st.co.kr%2Fproducts%2F6388468440%3F%26trTypeCd%3DPW%26trCtgrNo%3D585021%26priceCompare%3Dfalse",
+            "confidence": 0.75
+          },
+          {
+            "name": "1m/17cm 충전 케이블 액세서리 마이크로 USB Type-C 스마트 시계 충전기 코드 Garmin Fenix 7/7S/7X/6/6S 용 휴대용",
+            "platform": "11번가",
+            "price_usd": 5.983433622555238,
+            "source_id": "products:68132",
+            "seller": "커루비",
+            "url": "https://www.11st.co.kr/products/9287201096?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "데이터 프로그 1m 2m 3M 호환 USB 타입 C 충전 케이블 PS5/Xbox 시리즈 S X 컨트롤러 게임패드 전원 코드",
+            "platform": "11번가",
+            "price_usd": 8.242485092295482,
+            "source_id": "products:100279",
+            "seller": "루나벨씨",
+            "url": "https://www.11st.co.kr/products/9234339629?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "Garmin Vivoactive 3 충전기 4s 935 Venu Sq 945 245 Fenix 5S 5X Plus 7 6 6S 6X Pro 케이블용 USB 고속",
+            "platform": "11번가",
+            "price_usd": 5.494990061530321,
+            "source_id": "products:68123",
+            "seller": "파트아웃16",
+            "url": "https://www.11st.co.kr/products/9243327336?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "아이폰 16 15용 자동차 카플레이 케이블 2팩, [애플 MFi 인증] 1.8m(6.6피트) USB A to USB C 고속 차량용 충전기 코드 아이폰 16/16 플러스/16 프로/16 프로 맥스/15/15프로/15 프로 맥스 아이패드 프로 12.9 차량용 충전 케이블",
+            "platform": "11번가",
+            "price_usd": 6.173383896287151,
+            "source_id": "products:42",
+            "seller": "",
+            "url": "https://www.11st.co.kr/products/pa/7719882789?&trTypeCd=MAS90&trCtgrNo=585021",
+            "confidence": 0.75
+          },
+          {
+            "name": "33W USB 충전기 타입 C 고속 6A 케이블 퀵폰 어댑터 샤오미 mi14 13 12 레드미 아이폰 원플러스용",
+            "platform": "11번가",
+            "price_usd": 6.25479115645797,
+            "source_id": "products:26072",
+            "seller": "라인프로토",
+            "url": "https://www.11st.co.kr/products/9228447902?&trTypeCd=05&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "구글 30W 충전기 픽셀 10 8 7 6 9 Pro XL 타입 C 고속 USB 케이블 휴대폰 액세서리",
+            "platform": "11번가",
+            "price_usd": 6.383685985061768,
+            "source_id": "products:24935",
+            "seller": "하루코퍼레이션10",
+            "url": "https://www.11st.co.kr/products/9306249011?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "구글 픽셀 9 9A 8 7 6 10 프로 XL용 PD 30W 고속 충전기, 충전 플러그 어댑터, USB 타입 C 케이블, 휴대폰",
+            "platform": "11번가",
+            "price_usd": 6.580420197141248,
+            "source_id": "products:24930",
+            "seller": "파트아웃16",
+            "url": "https://www.11st.co.kr/products/9243168137?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "애플워치 충전기 USB 타입 10 9 8 7 6 SE 4 3 2 1 울트라 무선충전 케이블",
+            "platform": "11번가",
+            "price_usd": 6.648259580616932,
+            "source_id": "products:13449",
+            "seller": "케이맥스",
+            "url": "https://action.adoffice.11st.co.kr/act/click/v1/landing/clickdata/compress?clickData=xOuQpbJnZUvSANgilUQrEekoRGnp0B3UONblg4gaSU1i4Zxd78NZQfBaDCb57Q8g9oSBbzJvANrfw4Cbou6C5nR7nZSoET1dG5j6QYbwo0UyZvEzO8KbNI3eLijMMoMg1TjwFlfZXmufdxSAFY9b657CFLNaI-AMxD6C4BRFLLq-kiVVusdVNBwYC9tHKIJ5r0AU2XG3BnuiC39EnAmtO0gB42jlHX9P5zliafa26WdDlScGFpCiw60wBp8ir2YaAFMECmHihqVAFecTRxCT35AHNSNrTCzHUbWZgN0WzGcrggXfuMlmZuAGv2sPZVyseTCOEAQSY-Uu2HCsmHJjO4rv5dr33glPplBkOvvPkyJ_hnLoZs9bItjkSCr6LrQZcyQjJaETtyOp8zh9dxnutdCMzkjC3vPM4TSfwK6ao3gunVZGh_270hMGgtTI5X9ji1qb8CDW89V6cZdabbXA3ctvF7z-IaoArSBvPMRYFIwk1WC48ZNdxZwTENS_WcTHLsTNaN9fMCINw7meTfxZd2iWO6a2tJt6MS62943Whlbxxh1K-c-bU8Rh48rY-zP_xqNn5gpx5bP5pLxL7W_fuNWKrE88gFE9YmNB1gX3ZxmhBiMa54Ceh-AtI9kjWX8M_Ucqn7RIjKvICXyv9KYSyD7ZyKWXsoJTEL7QLeG-AFW8sjCRN0ZOrIi5YbzeIp8YwcKA29bJUfTUzHxHZEn9gK94Meu72vdHYJM9DdtBJStYSrT8RHKc1fz06P4KpIBtJtqI-e_JaEs35obMC1P49Z2ahQ4PhCOf4-zZo9tgY-qDGNJy9kEti0eAYzxLflEBU2SyxaALBKOXxx-39rCCwQpBAHjZE8cSLtgaOGWqsA1mEpplNuL-qRXldxI7KAjP8_nvi-FI4y3pOqLDXULHxmaENyRYjKvldrfIvBdYFE4ZHG6BMgOWS1IYhCtYZC07crUefe3eiNPTymL5F8YaBoEXZ7fwPwNBsFvTUhR65uCEAzqtPjitboMMaNwxTPm9HSt5lTF0nqY3E-J9_9Swyj601FZRKOenCYZSBUlF-D0YEGItCW_gBEDRMaw1xV2_faLNVH07Ojvn1VMc3Emy8uqO0CHaiupWlQ9J8cbfAaNKhL2CtuJi-XWqO39TCGIXpUqGBtWvrcM9N1A8KEnkUWLo8tCBX-FF8KT4CaOu9ble3ChYDyPdaYm4yUqS5UGC&redirect=https%3A%2F%2Fwww.11st.co.kr%2Fproducts%2F7324082448%3F%26trTypeCd%3DMAS113%26trCtgrNo%3D585021%26checkCtlgPrd%3Dtrue",
+            "confidence": 0.75
+          },
+          {
+            "name": "구글 30W 충전기 픽셀 10 8 7 6 9 Pro XL 9A 타입 C 고속 USB 케이블 휴대폰 액세서리",
+            "platform": "11번가",
+            "price_usd": 6.783938347568298,
+            "source_id": "products:24963",
+            "seller": "글로밋프라자",
+            "url": "https://www.11st.co.kr/products/9296006645?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          }
+        ],
+        "task_summary": {
+          "task_type": "buy",
+          "product": "USB 케이블 1m 가성비 좋은거",
+          "budget": null,
+          "best_local_price": 5.087953760676223,
+          "best_local_platform": "11번가"
+        },
+        "comparison": {
+          "winner": "Edenclaw AI",
+          "winner_result": {
+            "agent": "Edenclaw AI",
+            "model": "Qwen/Qwen2.5-72B-Instruct",
+            "scenario": "buy",
+            "recommendation": "[products:68152] 아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m",
+            "platform": "11번가",
+            "price": 5.09,
+            "confidence": 85.0,
+            "fraud_risk": 10.0,
+            "negotiation_success": 20.0,
+            "expected_profit_rate": 0.0,
+            "details": "가장 저렴한 가격으로 제공되며, 여러 가민 워치 모델에 호환되는 USB 케이블입니다. 가성비가 뛰어나며, 11번가에서 판매되고 있어 신뢰성이 있습니다. 구매 전에 제품 리뷰와 판매자의 평점을 확인하세요.",
+            "raw": "{\n  \"recommendation\": \"[products:68152] 아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m\",\n  \"platform\": \"11번가\",\n  \"price\": 5.09,\n  \"confidence\": 85,\n  \"fraud_risk\": 10,\n  \"negotiation_success\": 20,\n  \"expected_profit_rate\": 0,\n  \"details\": \"가장 저렴한 가격으로 제공되며, 여러 가민 워치 모델에 호환되는 USB 케이블입니다. 가성비가 뛰어나며, 11번가에서 판매되고 있어 신뢰성이 있습니다. 구매 전에 제품 리뷰와 판매자의 평점을 확인하세요.\"\n}",
+            "latency_ms": 3250.653501033783,
+            "cost_usd": 0.0,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 100.0,
+              "response_speed": 0.03,
+              "negotiation_success": 20.0,
+              "trade_profit": 0.0,
+              "recommendation_accuracy": 85.0,
+              "fraud_avoidance": 90.0,
+              "total": 51.14,
+              "learning_bias": -1.96
+            }
+          },
+          "results": [
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "buy",
+              "recommendation": "[products:68152] 아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m",
+              "platform": "11번가",
+              "price": 5.09,
+              "confidence": 85.0,
+              "fraud_risk": 10.0,
+              "negotiation_success": 20.0,
+              "expected_profit_rate": 0.0,
+              "details": "가장 저렴한 가격으로 제공되며, 여러 가민 워치 모델에 호환되는 USB 케이블입니다. 가성비가 뛰어나며, 11번가에서 판매되고 있어 신뢰성이 있습니다. 구매 전에 제품 리뷰와 판매자의 평점을 확인하세요.",
+              "raw": "{\n  \"recommendation\": \"[products:68152] 아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m\",\n  \"platform\": \"11번가\",\n  \"price\": 5.09,\n  \"confidence\": 85,\n  \"fraud_risk\": 10,\n  \"negotiation_success\": 20,\n  \"expected_profit_rate\": 0,\n  \"details\": \"가장 저렴한 가격으로 제공되며, 여러 가민 워치 모델에 호환되는 USB 케이블입니다. 가성비가 뛰어나며, 11번가에서 판매되고 있어 신뢰성이 있습니다. 구매 전에 제품 리뷰와 판매자의 평점을 확인하세요.\"\n}",
+              "latency_ms": 3250.653501033783,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.03,
+                "negotiation_success": 20.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 85.0,
+                "fraud_avoidance": 90.0,
+                "total": 51.14,
+                "learning_bias": -1.96
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "buy",
+              "recommendation": "샤오미, 아이폰 등 다양한 기기를 지원하는 33W 고속 충전기와 6A 타입C 케이블 세트가 $6.25로 가성비가 가장 좋습니다. 1m 길이를 충족할 가능성이 높습니다.",
+              "platform": "11번가",
+              "price": 6.25,
+              "confidence": 85.0,
+              "fraud_risk": 10.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 0.0,
+              "details": "이 제품은 33W 고속 충전기와 6A 고속 충전 케이블이 포함된 세트로, 가격 대비 성능이 매우 뛰어납니다. 다만, 사용하려는 기기가 USB 타입C 포트를 사용하는지 확인해야 하며, 상품 상세 설명에서 케이블의 정확한 길이가 1m인지 확인하는 것이 좋습니다.",
+              "raw": "{\n  \"recommendation\": \"샤오미, 아이폰 등 다양한 기기를 지원하는 33W 고속 충전기와 6A 타입C 케이블 세트가 $6.25로 가성비가 가장 좋습니다. 1m 길이를 충족할 가능성이 높습니다.\",\n  \"platform\": \"11번가\",\n  \"price\": 6.25,\n  \"confidence\": 0.85,\n  \"fraud_risk\": 0.1,\n  \"negotiation_success\": 0,\n  \"expected_profit_rate\": 0,\n  \"details\": \"이 제품은 33W 고속 충전기와 6A 고속 충전 케이블이 포함된 세트로, 가격 대비 성능이 매우 뛰어납니다. 다만, 사용하려는 기기가 USB 타입C 포트를 사용하는지 확인해야 하며, 상품 상세 설명에서 케이블의 정확한 길이가 1m인지 확인하는 것이 좋습니다.\"\n}",
+              "latency_ms": 23531.2305059433,
+              "cost_usd": 0.00158625,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 81.44,
+                "response_speed": 0.0,
+                "negotiation_success": 0.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 85.0,
+                "fraud_avoidance": 90.0,
+                "total": 43.28,
+                "learning_bias": -2.54
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "buy",
+              "recommendation": "아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m 후보가 현재 로컬 데이터에서 가장 경쟁력 있습니다.",
+              "platform": "11번가",
+              "price": 5.19,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.024637222290039062,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.07,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 22.79,
+                "learning_bias": -1.69
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "buy",
+              "recommendation": "아야 가민 워치 포러너55/255/265/955/인스팅트2/피닉스 충전기 USB 충전케이블 1m 후보가 현재 로컬 데이터에서 가장 경쟁력 있습니다.",
+              "platform": "11번가",
+              "price": 5.24,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 829.0966100692749,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 97.14,
+                "response_speed": 0.12,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 12.52,
+                "learning_bias": -2.09
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 5.09,
+            "max_price": 6.25,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123754.html",
+        "learning": [
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.651818181818186,
+            "avg_latency_ms": 2592.265031120994,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.45454545454545
+          },
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.48818181818182,
+            "avg_latency_ms": 0.023001930930397728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 46.9,
+            "avg_latency_ms": 3271.6200914382935,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 70.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 45.96272727272728,
+            "avg_latency_ms": 577.6095191348683,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 44.68454545454546,
+            "avg_latency_ms": 5927.104637622833,
+            "avg_cost_usd": 0.0003261363636363636,
+            "avg_fraud_avoidance": 78.54545454545455
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 42.03,
+            "avg_latency_ms": 0.02998495101928711,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.016644954681396484,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.0989990234375,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 32.15,
+            "avg_latency_ms": 1421.886459827423,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 31.18,
+            "avg_latency_ms": 11019.577722072601,
+            "avg_cost_usd": 0.000195,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 30.24,
+            "avg_latency_ms": 716.8014168739319,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 30.23,
+            "avg_latency_ms": 1057.981517314911,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 28.63,
+            "avg_latency_ms": 9841.525187969208,
+            "avg_cost_usd": 0.00060125,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 28.62,
+            "avg_latency_ms": 10459.235706806183,
+            "avg_cost_usd": 0.00019625,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 14.44,
+            "avg_latency_ms": 3487.3983192443848,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 99.9
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 14.01,
+            "avg_latency_ms": 2529.1549620628357,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 100.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "협상",
+        "scenario": "negotiate",
+        "message": "MacBook Pro 16인치 중고 협상해줘"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 15,
+        "task": {
+          "scenario": "negotiate",
+          "message": "MacBook Pro 16인치 중고 협상해줘",
+          "product_name": "MacBook Pro 16인치 중고",
+          "budget": null,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "협상",
+            "scenario": "negotiate"
+          }
+        },
+        "candidate_count": 0,
+        "candidates": [],
+        "task_summary": {
+          "task_type": "negotiate",
+          "product": "MacBook Pro 16인치 중고",
+          "start_price": null,
+          "market_floor": null,
+          "seller_info": ""
+        },
+        "comparison": {
+          "winner": "Edenclaw AI",
+          "winner_result": {
+            "agent": "Edenclaw AI",
+            "model": "Qwen/Qwen2.5-72B-Instruct",
+            "scenario": "negotiate",
+            "recommendation": "중고 MacBook Pro 16인치의 시장 가격을 확인하고, 판매자의 상태와 가격을 비교하여 합리적인 가격으로 협상하세요.",
+            "platform": "Naver Cafe, Craigslist, Facebook Marketplace",
+            "price": 0.0,
+            "confidence": 50.0,
+            "fraud_risk": 20.0,
+            "negotiation_success": 60.0,
+            "expected_profit_rate": 30.0,
+            "details": "안녕하세요, MacBook Pro 16인치에 관심이 있습니다. 현재 시장 가격을 확인해보니 비슷한 상태의 제품들이 대략 1,500,000원에서 2,000,000원 사이에 거래되고 있어요. 혹시 이 가격대와 비교해서 조정 가능하신 부분이 있으신지 궁금합니다. 감사합니다.",
+            "raw": "{\n  \"recommendation\": \"중고 MacBook Pro 16인치의 시장 가격을 확인하고, 판매자의 상태와 가격을 비교하여 합리적인 가격으로 협상하세요.\",\n  \"platform\": \"Naver Cafe, Craigslist, Facebook Marketplace\",\n  \"price\": 0,\n  \"confidence\": 50,\n  \"fraud_risk\": 20,\n  \"negotiation_success\": 60,\n  \"expected_profit_rate\": 30,\n  \"details\": \"안녕하세요, MacBook Pro 16인치에 관심이 있습니다. 현재 시장 가격을 확인해보니 비슷한 상태의 제품들이 대략 1,500,000원에서 2,000,000원 사이에 거래되고 있어요. 혹시 이 가격대와 비교해서 조정 가능하신 부분이 있으신지 궁금합니다. 감사합니다.\"\n}",
+            "latency_ms": 3242.053252696991,
+            "cost_usd": 0.0,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 55.0,
+              "response_speed": 0.03,
+              "negotiation_success": 60.0,
+              "trade_profit": 60.0,
+              "recommendation_accuracy": 50.0,
+              "fraud_avoidance": 80.0,
+              "total": 51.5
+            }
+          },
+          "results": [
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "negotiate",
+              "recommendation": "중고 MacBook Pro 16인치의 시장 가격을 확인하고, 판매자의 상태와 가격을 비교하여 합리적인 가격으로 협상하세요.",
+              "platform": "Naver Cafe, Craigslist, Facebook Marketplace",
+              "price": 0.0,
+              "confidence": 50.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 60.0,
+              "expected_profit_rate": 30.0,
+              "details": "안녕하세요, MacBook Pro 16인치에 관심이 있습니다. 현재 시장 가격을 확인해보니 비슷한 상태의 제품들이 대략 1,500,000원에서 2,000,000원 사이에 거래되고 있어요. 혹시 이 가격대와 비교해서 조정 가능하신 부분이 있으신지 궁금합니다. 감사합니다.",
+              "raw": "{\n  \"recommendation\": \"중고 MacBook Pro 16인치의 시장 가격을 확인하고, 판매자의 상태와 가격을 비교하여 합리적인 가격으로 협상하세요.\",\n  \"platform\": \"Naver Cafe, Craigslist, Facebook Marketplace\",\n  \"price\": 0,\n  \"confidence\": 50,\n  \"fraud_risk\": 20,\n  \"negotiation_success\": 60,\n  \"expected_profit_rate\": 30,\n  \"details\": \"안녕하세요, MacBook Pro 16인치에 관심이 있습니다. 현재 시장 가격을 확인해보니 비슷한 상태의 제품들이 대략 1,500,000원에서 2,000,000원 사이에 거래되고 있어요. 혹시 이 가격대와 비교해서 조정 가능하신 부분이 있으신지 궁금합니다. 감사합니다.\"\n}",
+              "latency_ms": 3242.053252696991,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.03,
+                "negotiation_success": 60.0,
+                "trade_profit": 60.0,
+                "recommendation_accuracy": 50.0,
+                "fraud_avoidance": 80.0,
+                "total": 51.5
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "negotiate",
+              "recommendation": "판매자에게 제품의 상세 스펙(모델 연식, CPU, RAM, SSD, 배터리 사이클)과 상태를 먼저 문의하여 정보를 확보한 후, 확인된 정보를 바탕으로 시세를 파악하고 가격 협상을 시작하는 '정보 확인 우선' 전략을 추천합니다. 사기 위험을 줄이기 위해 직거래를 제안하세요.",
+              "platform": "중고 거래 플랫폼 (당근마켓, 중고나라 등)",
+              "price": 0.0,
+              "confidence": 20.0,
+              "fraud_risk": 80.0,
+              "negotiation_success": 30.0,
+              "expected_profit_rate": 0.0,
+              "details": "{'negotiation_plan': '1. 판매자에게 제품의 정확한 스펙(모델 연식, CPU, RAM, SSD 용량)과 배터리 사이클 수, 외관 상태(사진 포함)를 정중히 문의하여 정보를 수집합니다. 2. 수집된 정보를 바탕으로 유사 매물의 중고 시세를 파악합니다. 3. 시세에 맞춰 합리적인 가격을 제시하며 협상을 시작합니다. 4. 안전한 거래를 위해 반드시 직거래를 제안하고, 현장에서 기기 상태를 꼼꼼히 확인합니다.', 'message_to_send': '안녕하세요, 게시글 보고 연락드렸습니다. 맥북 프로 16인치 모델에 관심이 많은데, 혹시 정확한 모델 연식, CPU, RAM, 저장 공간 용량, 그리고 배터리 사이클 수를 알 수 있을까요? 외관에 스크래치나 찍힘 같은 특이사항이 있는지도 궁금합니다. 답변 부탁드립니다!', 'expected_final_price': '정보 확인 후 시세에 따라 결정 (예상 불가)'}",
+              "raw": "{\n  \"recommendation\": \"판매자에게 제품의 상세 스펙(모델 연식, CPU, RAM, SSD, 배터리 사이클)과 상태를 먼저 문의하여 정보를 확보한 후, 확인된 정보를 바탕으로 시세를 파악하고 가격 협상을 시작하는 '정보 확인 우선' 전략을 추천합니다. 사기 위험을 줄이기 위해 직거래를 제안하세요.\",\n  \"platform\": \"중고 거래 플랫폼 (당근마켓, 중고나라 등)\",\n  \"price\": 0,\n  \"confidence\": 20,\n  \"fraud_risk\": 80,\n  \"negotiation_success\": 30,\n  \"expected_profit_rate\": 0,\n  \"details\": {\n    \"negotiation_plan\": \"1. 판매자에게 제품의 정확한 스펙(모델 연식, CPU, RAM, SSD 용량)과 배터리 사이클 수, 외관 상태(사진 포함)를 정중히 문의하여 정보를 수집합니다. 2. 수집된 정보를 바탕으로 유사 매물의 중고 시세를 파악합니다. 3. 시세에 맞춰 합리적인 가격을 제시하며 협상을 시작합니다. 4. 안전한 거래를 위해 반드시 직거래를 제안하고, 현장에서 기기 상태를 꼼꼼히 확인합니다.\",\n    \"message_to_send\": \"안녕하세요, 게시글 보고 연락드렸습니다. 맥북 프로 16인치 모델에 관심이 많은데, 혹시 정확한 모델 연식, CPU, RAM, 저장 공간 용량, 그리고 배터리 사이클 수를 알 수 있을까요? 외관에 스크래치나 찍힘 같은 특이사항이 있는지도 궁금합니다. 답변 부탁드립니다!\",\n    \"expected_final_price\": \"정보 확인 후 시세에 따라 결정 (예상 불가)\"\n  }\n}",
+              "latency_ms": 16983.756319522858,
+              "cost_usd": 0.0022449999999999996,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.01,
+                "negotiation_success": 30.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 20.0,
+                "fraud_avoidance": 20.0,
+                "total": 23.3
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "negotiate",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 0.0,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 72.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.025868892669677734,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 60.0,
+                "negotiation_success": 72.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 17.24
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "negotiate",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 0.0,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 72.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 1098.0838832855225,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.09,
+                "negotiation_success": 72.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 7.57
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 0.0,
+            "max_price": 0.0,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123811.html",
+        "learning": [
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.651818181818186,
+            "avg_latency_ms": 2592.265031120994,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.45454545454545
+          },
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.48818181818182,
+            "avg_latency_ms": 0.023001930930397728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 49.2,
+            "avg_latency_ms": 3256.836672067642,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 75.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 45.96272727272728,
+            "avg_latency_ms": 577.6095191348683,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 44.68454545454546,
+            "avg_latency_ms": 5927.104637622833,
+            "avg_cost_usd": 0.0003261363636363636,
+            "avg_fraud_avoidance": 78.54545454545455
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.016644954681396484,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.0989990234375,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 30.24,
+            "avg_latency_ms": 716.8014168739319,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 30.23,
+            "avg_latency_ms": 1057.981517314911,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 29.634999999999998,
+            "avg_latency_ms": 0.027926921844482422,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 28.63,
+            "avg_latency_ms": 9841.525187969208,
+            "avg_cost_usd": 0.00060125,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 28.62,
+            "avg_latency_ms": 10459.235706806183,
+            "avg_cost_usd": 0.00019625,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 27.240000000000002,
+            "avg_latency_ms": 14001.66702079773,
+            "avg_cost_usd": 0.0012199999999999997,
+            "avg_fraud_avoidance": 48.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 19.86,
+            "avg_latency_ms": 1259.9851715564728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 14.44,
+            "avg_latency_ms": 3487.3983192443848,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 99.9
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 14.01,
+            "avg_latency_ms": 2529.1549620628357,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 100.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "매도",
+        "scenario": "sell",
+        "message": "내가 가진 iPad Pro 팔고 싶어"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 16,
+        "task": {
+          "scenario": "sell",
+          "message": "내가 가진 iPad Pro 팔고 싶어",
+          "product_name": "iPad Pro",
+          "budget": null,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "매도",
+            "scenario": "sell"
+          }
+        },
+        "candidate_count": 10,
+        "candidates": [
+          {
+            "name": "REFURBISHED Apple iPad Pro 12.9 (1st Gen.) 32GB Space Gray (Unlocked) Grade B",
+            "platform": "Newegg",
+            "price_usd": 107.73,
+            "source_id": "global_products:8501",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/0EJ-001B-009E4",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7\" with Wi-Fi + Cellular 32GB - Space Gray",
+            "platform": "Newegg",
+            "price_usd": 108.27,
+            "source_id": "global_products:8495",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-space-gray-ipad-pro-a1674/p/0EJ-001B-00393",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7\" (1st Gen) A1673 (WiFi) 128GB Space Gray",
+            "platform": "Newegg",
+            "price_usd": 114.99,
+            "source_id": "global_products:8470",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/24W-0002-00TT5",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro (1st Gen) 32GB - Wi-Fi - 9.7\" - Space Gray - (2016) - Good Condition",
+            "platform": "Newegg",
+            "price_usd": 114.99,
+            "source_id": "global_products:8476",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/24W-0002-018E7",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7 (1st Gen) A1673 (WiFi) 128GB Gold (Grade A)",
+            "platform": "Newegg",
+            "price_usd": 114.99,
+            "source_id": "global_products:8534",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-a1673-ipad-pro-9-7-gold/p/24W-0002-013X8",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7\" (1st Gen) A1673 (WiFi + Cellular Unlocked) 128GB Space Gray",
+            "platform": "Newegg",
+            "price_usd": 117.12,
+            "source_id": "global_products:8509",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/24W-0002-00V72",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7 (1st Gen) A1673 (WiFi) 128GB Space Gray (Grade A+)",
+            "platform": "Newegg",
+            "price_usd": 119.99,
+            "source_id": "global_products:8512",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-a1673-ipad-pro-9-7-gray/p/24W-0002-014D9",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro 9.7\" (1st Gen) A1673 (WiFi + Cellular Unlocked) 32GB Space Gray (Grade A+)",
+            "platform": "Newegg",
+            "price_usd": 119.99,
+            "source_id": "global_products:8513",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/apple-a1673-ipad-pro-9-7-gray/p/24W-0002-012R6",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Refurbished Apple iPad Pro 9.7 (1st Gen) A1673 (WiFi + Cellular Unlocked) 128GB Space Gray (Grade B)",
+            "platform": "Newegg",
+            "price_usd": 119.99,
+            "source_id": "global_products:8517",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/24W-0002-01535",
+            "confidence": 0.75
+          },
+          {
+            "name": "REFURBISHED Apple iPad Pro (1st Gen) 32GB - Wi-Fi - 9.7\" - Space Gray - (2016) - Very Good Condition",
+            "platform": "Newegg",
+            "price_usd": 124.99,
+            "source_id": "global_products:8477",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/24W-0002-018E6",
+            "confidence": 0.75
+          }
+        ],
+        "task_summary": {
+          "task_type": "sell",
+          "product": "iPad Pro",
+          "target_price": null,
+          "best_comparable_price": 124.99,
+          "best_platform": "Newegg"
+        },
+        "comparison": {
+          "winner": "Edenclaw AI",
+          "winner_result": {
+            "agent": "Edenclaw AI",
+            "model": "Qwen/Qwen2.5-72B-Instruct",
+            "scenario": "sell",
+            "recommendation": "당신의 iPad Pro를 Newegg에서 판매하는 것이 좋습니다.",
+            "platform": "Newegg",
+            "price": 124.99,
+            "confidence": 85.0,
+            "fraud_risk": 5.0,
+            "negotiation_success": 70.0,
+            "expected_profit_rate": 75.0,
+            "details": "제품 상태와 용량에 따라 가격이 달라질 수 있지만, 비슷한 모델들의 판매 가격을 고려할 때 124.99달러가 적절합니다. Newegg에서는 Grade B부터 A+까지 다양한 등급의 제품이 판매되고 있으며, 당신의 iPad Pro가 좋은 상태라면 A+ 등급으로 판매할 수 있습니다. \n\n제목: REFURBISHED Apple iPad Pro 9.7\" (1st Gen) 128GB Space Gray (Grade A+)\n상세: 이 iPad Pro는 완벽하게 작동하며, 미미한 사용 흔적만 있습니다. 모든 액세서리가 포함되어 있으며, 깨끗이 청소되었습니다.",
+            "raw": "{\n  \"recommendation\": \"당신의 iPad Pro를 Newegg에서 판매하는 것이 좋습니다.\",\n  \"platform\": \"Newegg\",\n  \"price\": 124.99,\n  \"confidence\": 85,\n  \"fraud_risk\": 5,\n  \"negotiation_success\": 70,\n  \"expected_profit_rate\": 75,\n  \"details\": \"제품 상태와 용량에 따라 가격이 달라질 수 있지만, 비슷한 모델들의 판매 가격을 고려할 때 124.99달러가 적절합니다. Newegg에서는 Grade B부터 A+까지 다양한 등급의 제품이 판매되고 있으며, 당신의 iPad Pro가 좋은 상태라면 A+ 등급으로 판매할 수 있습니다. \\n\\n제목: REFURBISHED Apple iPad Pro 9.7\\\" (1st Gen) 128GB Space Gray (Grade A+)\\n상세: 이 iPad Pro는 완벽하게 작동하며, 미미한 사용 흔적만 있습니다. 모든 액세서리가 포함되어 있으며, 깨끗이 청소되었습니다.\"\n}",
+            "latency_ms": 4032.5414609909058,
+            "cost_usd": 0.0,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 100.0,
+              "response_speed": 0.02,
+              "negotiation_success": 70.0,
+              "trade_profit": 100.0,
+              "recommendation_accuracy": 85.0,
+              "fraud_avoidance": 95.0,
+              "total": 77.8
+            }
+          },
+          "results": [
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "sell",
+              "recommendation": "당신의 iPad Pro를 Newegg에서 판매하는 것이 좋습니다.",
+              "platform": "Newegg",
+              "price": 124.99,
+              "confidence": 85.0,
+              "fraud_risk": 5.0,
+              "negotiation_success": 70.0,
+              "expected_profit_rate": 75.0,
+              "details": "제품 상태와 용량에 따라 가격이 달라질 수 있지만, 비슷한 모델들의 판매 가격을 고려할 때 124.99달러가 적절합니다. Newegg에서는 Grade B부터 A+까지 다양한 등급의 제품이 판매되고 있으며, 당신의 iPad Pro가 좋은 상태라면 A+ 등급으로 판매할 수 있습니다. \n\n제목: REFURBISHED Apple iPad Pro 9.7\" (1st Gen) 128GB Space Gray (Grade A+)\n상세: 이 iPad Pro는 완벽하게 작동하며, 미미한 사용 흔적만 있습니다. 모든 액세서리가 포함되어 있으며, 깨끗이 청소되었습니다.",
+              "raw": "{\n  \"recommendation\": \"당신의 iPad Pro를 Newegg에서 판매하는 것이 좋습니다.\",\n  \"platform\": \"Newegg\",\n  \"price\": 124.99,\n  \"confidence\": 85,\n  \"fraud_risk\": 5,\n  \"negotiation_success\": 70,\n  \"expected_profit_rate\": 75,\n  \"details\": \"제품 상태와 용량에 따라 가격이 달라질 수 있지만, 비슷한 모델들의 판매 가격을 고려할 때 124.99달러가 적절합니다. Newegg에서는 Grade B부터 A+까지 다양한 등급의 제품이 판매되고 있으며, 당신의 iPad Pro가 좋은 상태라면 A+ 등급으로 판매할 수 있습니다. \\n\\n제목: REFURBISHED Apple iPad Pro 9.7\\\" (1st Gen) 128GB Space Gray (Grade A+)\\n상세: 이 iPad Pro는 완벽하게 작동하며, 미미한 사용 흔적만 있습니다. 모든 액세서리가 포함되어 있으며, 깨끗이 청소되었습니다.\"\n}",
+              "latency_ms": 4032.5414609909058,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.02,
+                "negotiation_success": 70.0,
+                "trade_profit": 100.0,
+                "recommendation_accuracy": 85.0,
+                "fraud_avoidance": 95.0,
+                "total": 77.8
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "sell",
+              "recommendation": "iPad Pro 모델의 세부 정보(세대, 용량, 상태)를 확인한 후, 당근마켓에 약 15만원으로 올려 빠르게 판매하는 것을 추천합니다.",
+              "platform": "당근마켓",
+              "price": 101.75907521352447,
+              "confidence": 30.0,
+              "fraud_risk": 40.0,
+              "negotiation_success": 70.0,
+              "expected_profit_rate": 60.0,
+              "details": "판매 게시글 초안:\n제목: iPad Pro (모델명) (저장 공간) 판매합니다.\n내용:\n- 모델: iPad Pro O세대 O.O인치\n- 저장 공간: OOO GB\n- 색상: (예: 스페이스 그레이)\n- 연결: Wi-Fi / Wi-Fi + Cellular\n- 상태: (상세히 기재: 예: 액정 흠집 없음, 배터리 효율 OO%, 모든 기능 정상 작동)\n- 구성품: (예: 본체, 충전기, 박스 포함)\n\n가격 책정 근거:\n제시된 가격 15만원은 1세대 리퍼비시 제품들의 해외 시장 가격(약 110~125달러)을 기준으로 책정된 예상가입니다. 정확한 가격은 보유하신 iPad Pro의 세대, 화면 크기, 저장 공간, 셀룰러 지원 여부, 그리고 외관 상태 및 배터리 성능에 따라 달라집니다. 최신 모델이거나 상태가 매우 좋을 경우 더 높은 가격을 받을 수 있습니다.",
+              "raw": "{\n  \"recommendation\": \"iPad Pro 모델의 세부 정보(세대, 용량, 상태)를 확인한 후, 당근마켓에 약 15만원으로 올려 빠르게 판매하는 것을 추천합니다.\",\n  \"platform\": \"당근마켓\",\n  \"price\": 150000,\n  \"confidence\": 0.3,\n  \"fraud_risk\": 0.4,\n  \"negotiation_success\": 0.7,\n  \"expected_profit_rate\": 0.6,\n  \"details\": \"판매 게시글 초안:\\n제목: iPad Pro (모델명) (저장 공간) 판매합니다.\\n내용:\\n- 모델: iPad Pro O세대 O.O인치\\n- 저장 공간: OOO GB\\n- 색상: (예: 스페이스 그레이)\\n- 연결: Wi-Fi / Wi-Fi + Cellular\\n- 상태: (상세히 기재: 예: 액정 흠집 없음, 배터리 효율 OO%, 모든 기능 정상 작동)\\n- 구성품: (예: 본체, 충전기, 박스 포함)\\n\\n가격 책정 근거:\\n제시된 가격 15만원은 1세대 리퍼비시 제품들의 해외 시장 가격(약 110~125달러)을 기준으로 책정된 예상가입니다. 정확한 가격은 보유하신 iPad Pro의 세대, 화면 크기, 저장 공간, 셀룰러 지원 여부, 그리고 외관 상태 및 배터리 성능에 따라 달라집니다. 최신 모델이거나 상태가 매우 좋을 경우 더 높은 가격을 받을 수 있습니다.\"\n}",
+              "latency_ms": 19128.133611679077,
+              "cost_usd": 0.00234875,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 81.41,
+                "response_speed": 0.01,
+                "negotiation_success": 70.0,
+                "trade_profit": 100.0,
+                "recommendation_accuracy": 30.0,
+                "fraud_avoidance": 60.0,
+                "total": 58.91
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "sell",
+              "recommendation": "REFURBISHED Apple iPad Pro (1st Gen) 32GB - Wi-Fi - 9.7\" - Space Gray - (2016) - Very Good Condition 판매가는 $119.99 근처가 적정합니다.",
+              "platform": "Newegg",
+              "price": 122.39,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.037105560302734375,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 97.92,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 24.44
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "sell",
+              "recommendation": "REFURBISHED Apple iPad Pro (1st Gen) 32GB - Wi-Fi - 9.7\" - Space Gray - (2016) - Very Good Condition 판매가는 $119.99 근처가 적정합니다.",
+              "platform": "Newegg",
+              "price": 123.59,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 805.8897666931152,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.88,
+                "response_speed": 0.12,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 14.99
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 101.75907521352447,
+            "max_price": 124.99,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123830.html",
+        "learning": [
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.651818181818186,
+            "avg_latency_ms": 2592.265031120994,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.45454545454545
+          },
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.48818181818182,
+            "avg_latency_ms": 0.023001930930397728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 49.2,
+            "avg_latency_ms": 3256.836672067642,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 75.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 46.12,
+            "avg_latency_ms": 3759.9698901176453,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 97.45
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 45.96272727272728,
+            "avg_latency_ms": 577.6095191348683,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 44.68454545454546,
+            "avg_latency_ms": 5927.104637622833,
+            "avg_cost_usd": 0.0003261363636363636,
+            "avg_fraud_avoidance": 78.54545454545455
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 43.769999999999996,
+            "avg_latency_ms": 14484.829399824142,
+            "avg_cost_usd": 0.0014750000000000002,
+            "avg_fraud_avoidance": 68.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.016644954681396484,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 32.065,
+            "avg_latency_ms": 0.06805229187011719,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 30.23,
+            "avg_latency_ms": 1057.981517314911,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 29.634999999999998,
+            "avg_latency_ms": 0.027926921844482422,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 28.62,
+            "avg_latency_ms": 10459.235706806183,
+            "avg_cost_usd": 0.00019625,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 27.240000000000002,
+            "avg_latency_ms": 14001.66702079773,
+            "avg_cost_usd": 0.0012199999999999997,
+            "avg_fraud_avoidance": 48.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 22.615,
+            "avg_latency_ms": 761.3455917835236,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 19.86,
+            "avg_latency_ms": 1259.9851715564728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 14.01,
+            "avg_latency_ms": 2529.1549620628357,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 100.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "차익거래",
+        "scenario": "arbitrage",
+        "message": "100달러 예산으로 차익거래 가능한 상품 찾아줘",
+        "budget": 100
+      },
+      "result": {
+        "ok": true,
+        "run_id": 17,
+        "task": {
+          "scenario": "arbitrage",
+          "message": "100달러 예산으로 차익거래 가능한 상품 찾아줘",
+          "product_name": "100달러 예산으로 차익거래 가능한 상품",
+          "budget": 100.0,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "차익거래",
+            "scenario": "arbitrage",
+            "budget": 100
+          }
+        },
+        "candidate_count": 10,
+        "candidates": [
+          {
+            "name": "소니 알파 FE 90mm F2.8 Macro G OSS/일본직수입/DN",
+            "platform": "11번가 -> Newegg",
+            "price_usd": 8811.67,
+            "source_id": "products:86205|global_products:7641",
+            "seller": "margin 1280.16%",
+            "url": "https://www.11st.co.kr/products/6362737854?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.9191
+          },
+          {
+            "name": "Sony FE 24-105mm f/4 G OSS Lens SEL24105G/2",
+            "platform": "Newegg -> 11번가",
+            "price_usd": 8582.47,
+            "source_id": "global_products:7566|products:86270",
+            "seller": "margin 883.02%",
+            "url": "https://www.newegg.com/p/043-0002-005R8",
+            "confidence": 0.9297
+          },
+          {
+            "name": "Sony FE 50mm f/1.4 GM Lens (Sony E)",
+            "platform": "Newegg -> 11번가",
+            "price_usd": 8193.67,
+            "source_id": "global_products:7565|products:86270",
+            "seller": "margin 602.15%",
+            "url": "https://www.newegg.com/p/043-0002-00B24",
+            "confidence": 0.9302
+          },
+          {
+            "name": "Sony SEL85F14GM FE 85 mm f/1.4 GM Lens",
+            "platform": "Newegg -> 11번가",
+            "price_usd": 8044.58,
+            "source_id": "global_products:7562|products:86270",
+            "seller": "margin 532.81%",
+            "url": "https://www.newegg.com/sony-3-5-fixed-focal-length/p/043-0002-001C8",
+            "confidence": 0.9358
+          },
+          {
+            "name": "USED - LIKE NEW Sony FE 400mm F2.8 GM OSS Lens",
+            "platform": "11번가 -> Newegg",
+            "price_usd": 7998.1,
+            "source_id": "products:86263|global_products:7641",
+            "seller": "margin 532.54%",
+            "url": "https://www.11st.co.kr/products/8816997126?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.9427
+          },
+          {
+            "name": "Gibson Custom 2012 1959 Les Paul Standard VOS Electric Guitar Washed Cherry",
+            "platform": "11번가 -> Amazon",
+            "price_usd": 7732.85,
+            "source_id": "products:112442|global_products:1756",
+            "seller": "margin 918.41%",
+            "url": "https://www.11st.co.kr/products/9279852907?&trTypeCd=05&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.9134
+          },
+          {
+            "name": "Sony FE 70-200mm F4 Macro G OSS II",
+            "platform": "Newegg -> 11번가",
+            "price_usd": 7720.58,
+            "source_id": "global_products:7639|products:86270",
+            "seller": "margin 421.01%",
+            "url": "https://www.newegg.com/p/043-0002-00B26",
+            "confidence": 0.9339
+          },
+          {
+            "name": "소니 FE 100-400mm F4.5-5.6 GM OSS/재고상품/DN",
+            "platform": "11번가 -> Newegg",
+            "price_usd": 7715.63,
+            "source_id": "products:86248|global_products:7641",
+            "seller": "margin 432.40%",
+            "url": "https://www.11st.co.kr/products/6358164689?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.9261
+          },
+          {
+            "name": "해외Dell XPS 8960 게이밍 데스크톱 컴퓨터 - 14세대 인텔 코어 i7-14700K 20코어, 최대 5.60GHz(액체 냉각, 64",
+            "platform": "Newegg -> 11번가",
+            "price_usd": 7485.44,
+            "source_id": "global_products:3917|products:38412",
+            "seller": "margin 1543.64%",
+            "url": "https://www.newegg.com/dell-xps-13-3-touch-screen-intel-core-i7-10710u-intel-uhd-graphics-16gb-memory-512gb-ssd-silver/p/1TS-000A-15JE0",
+            "confidence": 0.9078
+          },
+          {
+            "name": "Epiphone Inspired by Gibson Les Paul Standard 50s, Inverness Green with Bag",
+            "platform": "Amazon -> 11번가",
+            "price_usd": 7461.63,
+            "source_id": "global_products:1687|products:112479",
+            "seller": "margin 1214.22%",
+            "url": "https://www.amazon.com/dp/B0F3HTWM4G",
+            "confidence": 0.8826
+          }
+        ],
+        "task_summary": {
+          "task_type": "arbitrage",
+          "category": "100달러 예산으로 차익거래 가능한 상품",
+          "budget": 100.0,
+          "best_profit_usd": 8811.67,
+          "best_route": "11번가 -> Newegg"
+        },
+        "comparison": {
+          "winner": "Edenclaw AI",
+          "winner_result": {
+            "agent": "Edenclaw AI",
+            "model": "Qwen/Qwen2.5-72B-Instruct",
+            "scenario": "arbitrage",
+            "recommendation": "소니 FE 100-400mm F4.5-5.6 GM OSS/재고상품/DN",
+            "platform": "11번가 -> Newegg",
+            "price": 7715.63,
+            "confidence": 85.0,
+            "fraud_risk": 15.0,
+            "negotiation_success": 70.0,
+            "expected_profit_rate": 100.0,
+            "details": "예상 이익률은 432.40%로 높으며, 100달러 예산으로는 직접 구매는 어려우나, 중개 수수료 형태로 참여 가능. 사기 위험은 낮지만, 판매자 신뢰도 확인 필요. 협상 성공률은 높음.",
+            "raw": "{\n  \"recommendation\": \"소니 FE 100-400mm F4.5-5.6 GM OSS/재고상품/DN\",\n  \"platform\": \"11번가 -> Newegg\",\n  \"price\": 7715.63,\n  \"confidence\": 0.85,\n  \"fraud_risk\": 0.15,\n  \"negotiation_success\": 0.7,\n  \"expected_profit_rate\": 432.40,\n  \"details\": \"예상 이익률은 432.40%로 높으며, 100달러 예산으로는 직접 구매는 어려우나, 중개 수수료 형태로 참여 가능. 사기 위험은 낮지만, 판매자 신뢰도 확인 필요. 협상 성공률은 높음.\"\n}",
+            "latency_ms": 3134.18124294281,
+            "cost_usd": 0.0,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 85.01,
+              "response_speed": 0.03,
+              "negotiation_success": 70.0,
+              "trade_profit": 100.0,
+              "recommendation_accuracy": 85.0,
+              "fraud_avoidance": 85.0,
+              "total": 73.11
+            }
+          },
+          "results": [
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "arbitrage",
+              "recommendation": "소니 FE 100-400mm F4.5-5.6 GM OSS/재고상품/DN",
+              "platform": "11번가 -> Newegg",
+              "price": 7715.63,
+              "confidence": 85.0,
+              "fraud_risk": 15.0,
+              "negotiation_success": 70.0,
+              "expected_profit_rate": 100.0,
+              "details": "예상 이익률은 432.40%로 높으며, 100달러 예산으로는 직접 구매는 어려우나, 중개 수수료 형태로 참여 가능. 사기 위험은 낮지만, 판매자 신뢰도 확인 필요. 협상 성공률은 높음.",
+              "raw": "{\n  \"recommendation\": \"소니 FE 100-400mm F4.5-5.6 GM OSS/재고상품/DN\",\n  \"platform\": \"11번가 -> Newegg\",\n  \"price\": 7715.63,\n  \"confidence\": 0.85,\n  \"fraud_risk\": 0.15,\n  \"negotiation_success\": 0.7,\n  \"expected_profit_rate\": 432.40,\n  \"details\": \"예상 이익률은 432.40%로 높으며, 100달러 예산으로는 직접 구매는 어려우나, 중개 수수료 형태로 참여 가능. 사기 위험은 낮지만, 판매자 신뢰도 확인 필요. 협상 성공률은 높음.\"\n}",
+              "latency_ms": 3134.18124294281,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 85.01,
+                "response_speed": 0.03,
+                "negotiation_success": 70.0,
+                "trade_profit": 100.0,
+                "recommendation_accuracy": 85.0,
+                "fraud_avoidance": 85.0,
+                "total": 73.11
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "arbitrage",
+              "recommendation": "소니 알파 FE 90mm F2.8 Macro G OSS/일본직수입/DN 차익 후보를 우선 검토하세요.",
+              "platform": "11번가 -> Newegg",
+              "price": 8987.9,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 80.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.1371150016784668,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.03,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 100.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 40.69
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "arbitrage",
+              "recommendation": "죄송하지만, 현재 100달러 예산으로는 추천할 만한 차익거래 상품을 찾을 수 없습니다. 제시된 모든 후보 상품의 가격이 예산을 초과합니다.",
+              "platform": "11번가 -> Newegg",
+              "price": 8811.67,
+              "confidence": 10.0,
+              "fraud_risk": 0.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 0.0,
+              "details": "사용자께서 요청하신 100달러 예산으로는 현재 시스템에서 제안된 차익거래 상품을 구매할 수 없습니다. 모든 추천 후보 상품의 가격이 7,400달러를 초과하여 예산 범위를 크게 벗어납니다. 예산을 상향 조정하여 다시 검색해 보시는 것을 권장합니다.\n\n[market data fill] 소니 알파 FE 90mm F2.8 Macro G OSS/일본직수입/DN (11번가 -> Newegg, $8,811.67)",
+              "raw": "{\n  \"recommendation\": \"죄송하지만, 현재 100달러 예산으로는 추천할 만한 차익거래 상품을 찾을 수 없습니다. 제시된 모든 후보 상품의 가격이 예산을 초과합니다.\",\n  \"platform\": \"N/A\",\n  \"price\": 0,\n  \"confidence\": 0.1,\n  \"fraud_risk\": 0,\n  \"negotiation_success\": 0,\n  \"expected_profit_rate\": 0,\n  \"details\": \"사용자께서 요청하신 100달러 예산으로는 현재 시스템에서 제안된 차익거래 상품을 구매할 수 없습니다. 모든 추천 후보 상품의 가격이 7,400달러를 초과하여 예산 범위를 크게 벗어납니다. 예산을 상향 조정하여 다시 검색해 보시는 것을 권장합니다.\"\n}",
+              "latency_ms": 11281.995776176453,
+              "cost_usd": 0.0015825,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 97.09,
+                "response_speed": 0.01,
+                "negotiation_success": 0.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 10.0,
+                "fraud_avoidance": 100.0,
+                "total": 37.16
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "arbitrage",
+              "recommendation": "소니 알파 FE 90mm F2.8 Macro G OSS/일본직수입/DN 차익 후보를 우선 검토하세요.",
+              "platform": "11번가 -> Newegg",
+              "price": 9076.02,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 80.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 741.5958018302917,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.13,
+                "negotiation_success": 58.0,
+                "trade_profit": 100.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 31.24
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 7715.63,
+            "max_price": 9076.02,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123842.html",
+        "learning": [
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.651818181818186,
+            "avg_latency_ms": 2592.265031120994,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.45454545454545
+          },
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 50.48818181818182,
+            "avg_latency_ms": 0.023001930930397728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 49.2,
+            "avg_latency_ms": 3256.836672067642,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 75.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 46.12,
+            "avg_latency_ms": 3759.9698901176453,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 97.45
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 45.96272727272728,
+            "avg_latency_ms": 577.6095191348683,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 11,
+            "avg_score": 44.68454545454546,
+            "avg_latency_ms": 5927.104637622833,
+            "avg_cost_usd": 0.0003261363636363636,
+            "avg_fraud_avoidance": 78.54545454545455
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 43.769999999999996,
+            "avg_latency_ms": 14484.829399824142,
+            "avg_cost_usd": 0.0014750000000000002,
+            "avg_fraud_avoidance": 68.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 2,
+            "avg_score": 43.56,
+            "avg_latency_ms": 2831.668102502823,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 92.5
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 2,
+            "avg_score": 40.19,
+            "avg_latency_ms": 0.07687997817993164,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 2,
+            "avg_score": 32.89,
+            "avg_latency_ms": 10870.615741491318,
+            "avg_cost_usd": 0.000889375,
+            "avg_fraud_avoidance": 88.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 32.065,
+            "avg_latency_ms": 0.06805229187011719,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 2,
+            "avg_score": 30.735,
+            "avg_latency_ms": 899.7886595726013,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 29.634999999999998,
+            "avg_latency_ms": 0.027926921844482422,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 27.240000000000002,
+            "avg_latency_ms": 14001.66702079773,
+            "avg_cost_usd": 0.0012199999999999997,
+            "avg_fraud_avoidance": 48.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 2,
+            "avg_score": 22.615,
+            "avg_latency_ms": 761.3455917835236,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 2,
+            "avg_score": 19.86,
+            "avg_latency_ms": 1259.9851715564728,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          }
+        ]
+      }
+    }
+  ],
+  "cost_analysis": [
+    {
+      "agent": "OpenAI latest listed",
+      "input_per_1m": 1.75,
+      "output_per_1m": 14.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.009625,
+      "estimated_monthly_1000": 9.625,
+      "note": "OpenAI pricing currently lists gpt-5.2; gpt-5.5 price not published on pricing page"
+    },
+    {
+      "agent": "GPT-4o",
+      "input_per_1m": 2.5,
+      "output_per_1m": 10.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.00875,
+      "estimated_monthly_1000": 8.75,
+      "note": "OpenAI fallback"
+    },
+    {
+      "agent": "Claude",
+      "input_per_1m": 5.0,
+      "output_per_1m": 25.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.02,
+      "estimated_monthly_1000": 20.0,
+      "note": "Claude Opus 4.5"
+    },
+    {
+      "agent": "Gemini",
+      "input_per_1m": 1.25,
+      "output_per_1m": 10.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.006875,
+      "estimated_monthly_1000": 6.875,
+      "note": "Gemini 2.5 Pro <=200K prompt"
+    },
+    {
+      "agent": "Edenclaw AI",
+      "input_per_1m": 0.0,
+      "output_per_1m": 0.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.0,
+      "estimated_monthly_1000": 0.0,
+      "note": "self-hosted vLLM; excludes electricity"
+    }
+  ]
+}

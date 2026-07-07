@@ -11,12 +11,14 @@ interface OfficeData {
     lesserLegPV: number; greaterLegPV: number; carryForwardPV: number;
   };
   transactions: Array<{
-    id: string; txType: string; amount: number; pvGenerated: number; bvGenerated: number; createdAt: string;
+    id: string; txType: string; currency?: 'KRW' | 'EP'; amount: number; krwAmount?: number;
+    pvGenerated: number; bvGenerated: number; createdAt: string;
   }>;
 }
 
 const fmt = (n: number) => n.toLocaleString('ko-KR', { maximumFractionDigits: 2 });
 const usd = (n: number) => '$' + n.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const krw = (n: number) => '₩' + n.toLocaleString('ko-KR', { maximumFractionDigits: 0 });
 
 const TX_LABEL: Record<string, { ko: string; cls: string }> = {
   SUBSCRIPTION: { ko: '구독', cls: 'bg-indigo-500/15 text-indigo-300' },
@@ -27,6 +29,7 @@ const TX_LABEL: Record<string, { ko: string; cls: string }> = {
 export default function MyOfficeDashboard({ userId, refreshMs = 4000 }: { userId: string; refreshMs?: number }) {
   const [data, setData] = useState<OfficeData | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     try {
@@ -34,21 +37,33 @@ export default function MyOfficeDashboard({ userId, refreshMs = 4000 }: { userId
         `/api/office/${encodeURIComponent(userId)}`,
         { cache: 'no-store' }
       );
-      if (!ok || !data) { setErr(data?.error || '조회 실패'); return; }
+      if (!ok) { setErr(data?.error || '조회 실패'); return; }
+      // ok 응답이어도 핵심 필드(user/quota/legs)가 비면 그대로 렌더하면 크래시 → 빈 데이터로 안전 처리.
+      if (!data || !data.user || !data.quota || !data.legs) { setData(null); setErr(null); return; }
       setData(data); setErr(null);
-    } catch { setErr('네트워크 오류'); }
+    } catch {
+      setErr('네트워크 오류');
+    } finally {
+      // 성공/실패와 무관하게 로딩 패널을 반드시 걷어내 무한 대기를 차단한다.
+      setLoading(false);
+    }
   }, [userId]);
 
   useEffect(() => {
+    setLoading(true);
+    setData(null);
+    setErr(null);
     load();
     const t = setInterval(load, refreshMs);
     return () => clearInterval(t);
   }, [load, refreshMs]);
 
   if (err) return <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-red-300">⚠ {err} <span className="text-slate-400">({userId})</span></div>;
-  if (!data) return <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-6 text-slate-400 animate-pulse">마이오피스 불러오는 중…</div>;
+  if (loading && !data) return <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-6 text-slate-400 animate-pulse">마이오피스 불러오는 중…</div>;
+  if (!data) return <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-6 text-slate-400">조회된 계보 데이터가 없습니다. <span className="text-slate-500">({userId})</span></div>;
 
   const { user, quota, legs } = data;
+  const transactions = data.transactions ?? [];
   const remainPct = quota.allocated > 0 ? (quota.remaining / quota.allocated) * 100 : 0;
   const legTotal = Math.max(legs.leftPV + legs.rightPV, 1);
   const active = user.subscriptionStatus === 'ACTIVE';
@@ -131,11 +146,11 @@ export default function MyOfficeDashboard({ userId, refreshMs = 4000 }: { userId
       {/* 최근 트랜잭션 */}
       <div className="rounded-xl border border-slate-700 bg-slate-800/50 p-4">
         <div className="mb-3 text-sm font-semibold text-slate-300">최근 거래/수당 내역</div>
-        {data.transactions.length === 0 ? (
+        {transactions.length === 0 ? (
           <p className="text-sm text-slate-500">내역이 없습니다.</p>
         ) : (
           <ul className="space-y-2">
-            {data.transactions.map((t) => {
+            {transactions.map((t) => {
               const meta = TX_LABEL[t.txType] ?? { ko: t.txType, cls: 'bg-slate-600/30 text-slate-300' };
               return (
                 <li key={t.id} className="flex items-center justify-between rounded-lg bg-slate-900/40 px-3 py-2 text-sm">
@@ -143,8 +158,9 @@ export default function MyOfficeDashboard({ userId, refreshMs = 4000 }: { userId
                     <span className={`rounded px-2 py-0.5 text-[11px] font-semibold ${meta.cls}`}>{meta.ko}</span>
                     <span className="text-slate-400">PV {fmt(t.pvGenerated)} · BV {fmt(t.bvGenerated)}</span>
                   </div>
-                  <span className={`font-semibold ${t.txType === 'BONUS_MATCHING' ? 'text-emerald-300' : 'text-slate-200'}`}>
-                    {t.txType === 'BONUS_MATCHING' ? '+' : ''}{usd(t.amount)}
+                  <span className={`font-semibold ${t.currency === 'KRW' ? 'text-sky-300' : t.txType === 'BONUS_MATCHING' ? 'text-emerald-300' : 'text-slate-200'}`}>
+                    {/* 원화 결제는 KRW 매출로, 그 외(수당 등)는 EP/USD 로 통화 분리 표기 */}
+                    {t.currency === 'KRW' ? krw(t.krwAmount ?? 0) : `${t.txType === 'BONUS_MATCHING' ? '+' : ''}${usd(t.amount)}`}
                   </span>
                 </li>
               );

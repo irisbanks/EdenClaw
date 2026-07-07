@@ -1,0 +1,1542 @@
+{
+  "generated_at": "2026-05-03T12:31:46.248806",
+  "dashboard_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_dashboard_20260503_123146.html",
+  "cases": [
+    {
+      "case": {
+        "name": "고가 상품",
+        "scenario": "buy",
+        "message": "iPhone 15 Pro Max 256GB 사고 싶어"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 8,
+        "task": {
+          "scenario": "buy",
+          "message": "iPhone 15 Pro Max 256GB 사고 싶어",
+          "product_name": "iPhone 15 Pro Max 256GB",
+          "budget": 256.0,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "고가 상품",
+            "scenario": "buy"
+          }
+        },
+        "candidate_count": 0,
+        "candidates": [],
+        "task_summary": {
+          "task_type": "buy",
+          "product": "iPhone 15 Pro Max 256GB",
+          "budget": 256.0,
+          "best_local_price": null,
+          "best_local_platform": null
+        },
+        "comparison": {
+          "winner": "Claude",
+          "winner_result": {
+            "agent": "Claude",
+            "model": "claude-3-5-sonnet-latest",
+            "scenario": "buy",
+            "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+            "platform": "검증 필요",
+            "price": 261.12,
+            "confidence": 82.0,
+            "fraud_risk": 16.0,
+            "negotiation_success": 58.0,
+            "expected_profit_rate": 0.0,
+            "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+            "raw": "",
+            "latency_ms": 0.027741432189941406,
+            "cost_usd": 0.0,
+            "ok": false,
+            "error": "ANTHROPIC_API_KEY is not configured",
+            "source": "local-fallback",
+            "metrics": {
+              "lowest_price": 99.51,
+              "response_speed": 60.0,
+              "negotiation_success": 58.0,
+              "trade_profit": 0.0,
+              "recommendation_accuracy": 47.0,
+              "fraud_avoidance": 84.0,
+              "total": 38.89,
+              "learning_bias": -0.9
+            }
+          },
+          "results": [
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 261.12,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.027741432189941406,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.51,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 38.89,
+                "learning_bias": -0.9
+              }
+            },
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "buy",
+              "recommendation": "해외 온라인 플랫폼을 통해 구매를 고려하세요.",
+              "platform": "Overseas online platforms (e.g., Amazon, Apple Store)",
+              "price": 0.0,
+              "confidence": 70.0,
+              "fraud_risk": 10.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 0.0,
+              "details": "로컬 마켓플레이스 후보가 없으므로 해외 온라인 플랫폼을 통해 구매하는 것이 안전합니다. 가격, 배송비, 관세 등을 확인하고, 신뢰할 수 있는 판매자인지 검증하세요.",
+              "raw": "{\n  \"recommendation\": \"해외 온라인 플랫폼을 통해 구매를 고려하세요.\",\n  \"platform\": \"Overseas online platforms (e.g., Amazon, Apple Store)\",\n  \"price\": 0,\n  \"confidence\": 70,\n  \"fraud_risk\": 10,\n  \"negotiation_success\": 0,\n  \"expected_profit_rate\": 0,\n  \"details\": \"로컬 마켓플레이스 후보가 없으므로 해외 온라인 플랫폼을 통해 구매하는 것이 안전합니다. 가격, 배송비, 관세 등을 확인하고, 신뢰할 수 있는 판매자인지 검증하세요.\"\n}",
+              "latency_ms": 2510.6728715896606,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.04,
+                "negotiation_success": 0.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 70.0,
+                "fraud_avoidance": 90.0,
+                "total": 35.77,
+                "learning_bias": -1.54
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 263.68,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 2697.8708720207214,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.54,
+                "response_speed": 0.04,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 28.85,
+                "learning_bias": -1.05
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 259.84,
+              "confidence": 74.0,
+              "fraud_risk": 24.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 10225.066302776337,
+              "cost_usd": 0.00019749999999999998,
+              "ok": false,
+              "error": "non-json response",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.01,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 39.0,
+                "fraud_avoidance": 76.0,
+                "total": 26.72,
+                "learning_bias": -2.22
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 259.84,
+            "max_price": 263.68,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123103.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 8,
+            "avg_score": 58.3425,
+            "avg_latency_ms": 0.021980643272399902,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 8,
+            "avg_score": 55.823750000000004,
+            "avg_latency_ms": 337.26666963100433,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 8,
+            "avg_score": 52.44375,
+            "avg_latency_ms": 2574.8227260112762,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 92.625
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 8,
+            "avg_score": 45.42625,
+            "avg_latency_ms": 1496.5344015359879,
+            "avg_cost_usd": 2.4687499999999997e-05,
+            "avg_fraud_avoidance": 76.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "저가 상품",
+        "scenario": "buy",
+        "message": "USB 케이블 1m 가성비 좋은거"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 9,
+        "task": {
+          "scenario": "buy",
+          "message": "USB 케이블 1m 가성비 좋은거",
+          "product_name": "USB 케이블 1m 가성비 좋은거",
+          "budget": 1.0,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "저가 상품",
+            "scenario": "buy"
+          }
+        },
+        "candidate_count": 0,
+        "candidates": [],
+        "task_summary": {
+          "task_type": "buy",
+          "product": "USB 케이블 1m 가성비 좋은거",
+          "budget": 1.0,
+          "best_local_price": null,
+          "best_local_platform": null
+        },
+        "comparison": {
+          "winner": "Claude",
+          "winner_result": {
+            "agent": "Claude",
+            "model": "claude-3-5-sonnet-latest",
+            "scenario": "buy",
+            "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+            "platform": "검증 필요",
+            "price": 1.02,
+            "confidence": 82.0,
+            "fraud_risk": 16.0,
+            "negotiation_success": 58.0,
+            "expected_profit_rate": 0.0,
+            "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+            "raw": "",
+            "latency_ms": 0.024487018585205078,
+            "cost_usd": 0.0,
+            "ok": false,
+            "error": "ANTHROPIC_API_KEY is not configured",
+            "source": "local-fallback",
+            "metrics": {
+              "lowest_price": 99.02,
+              "response_speed": 60.0,
+              "negotiation_success": 58.0,
+              "trade_profit": 0.0,
+              "recommendation_accuracy": 47.0,
+              "fraud_avoidance": 84.0,
+              "total": 38.51,
+              "learning_bias": -1.17
+            }
+          },
+          "results": [
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 1.02,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.024487018585205078,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.02,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 38.51,
+                "learning_bias": -1.17
+              }
+            },
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "buy",
+              "recommendation": "해외 온라인 마켓플레이스에서 검색",
+              "platform": "Amazon, eBay",
+              "price": 0.0,
+              "confidence": 50.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 0.0,
+              "details": "로컬 마켓플레이스 후보가 없으므로 해외 온라인 마켓플레이스에서 가격과 리뷰를 확인해야 합니다. 배송비와 수입관세도 고려해야 합니다.",
+              "raw": "{\n  \"recommendation\": \"해외 온라인 마켓플레이스에서 검색\",\n  \"platform\": \"Amazon, eBay\",\n  \"price\": 0,\n  \"confidence\": 50,\n  \"fraud_risk\": 20,\n  \"negotiation_success\": 0,\n  \"expected_profit_rate\": 0,\n  \"details\": \"로컬 마켓플레이스 후보가 없으므로 해외 온라인 마켓플레이스에서 가격과 리뷰를 확인해야 합니다. 배송비와 수입관세도 고려해야 합니다.\"\n}",
+              "latency_ms": 2068.7984189987183,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.05,
+                "negotiation_success": 0.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 50.0,
+                "fraud_avoidance": 80.0,
+                "total": 30.55,
+                "learning_bias": -1.76
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 1.03,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 1630.6474494934082,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.06,
+                "response_speed": 0.06,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 28.38,
+                "learning_bias": -1.42
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "buy",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 1.01,
+              "confidence": 74.0,
+              "fraud_risk": 24.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 10827.861857891083,
+              "cost_usd": 0.00019125,
+              "ok": false,
+              "error": "non-json response",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.01,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 39.0,
+                "fraud_avoidance": 76.0,
+                "total": 26.48,
+                "learning_bias": -2.46
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 1.01,
+            "max_price": 1.03,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123114.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 56.26888888888889,
+            "avg_latency_ms": 0.022259129418267146,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 52.93222222222222,
+            "avg_latency_ms": 480.9756451712714,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 50.20666666666667,
+            "avg_latency_ms": 2518.597803009881,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.22222222222223
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 43.59444444444445,
+            "avg_latency_ms": 2533.3485633532205,
+            "avg_cost_usd": 4.319444444444444e-05,
+            "avg_fraud_avoidance": 76.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "협상",
+        "scenario": "negotiate",
+        "message": "MacBook Pro 16인치 중고 협상해줘"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 10,
+        "task": {
+          "scenario": "negotiate",
+          "message": "MacBook Pro 16인치 중고 협상해줘",
+          "product_name": "MacBook Pro 16인치 중고 협상해줘",
+          "budget": 16.0,
+          "preferred_platform": "",
+          "target_price": 16.0,
+          "seller_info": "",
+          "start_price": 16.0,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "협상",
+            "scenario": "negotiate"
+          }
+        },
+        "candidate_count": 0,
+        "candidates": [],
+        "task_summary": {
+          "task_type": "negotiate",
+          "product": "MacBook Pro 16인치 중고 협상해줘",
+          "start_price": 16.0,
+          "market_floor": null,
+          "seller_info": ""
+        },
+        "comparison": {
+          "winner": "Edenclaw AI",
+          "winner_result": {
+            "agent": "Edenclaw AI",
+            "model": "Qwen/Qwen2.5-72B-Instruct",
+            "scenario": "negotiate",
+            "recommendation": "먼저, 제품의 상태와 사용 기간, 보증 여부 등을 확인하세요. 시장 가격을 조사하여 합리적인 가격대를 제시하고, 필요하다면 전문가의 검사를 요청하세요.",
+            "platform": "중고마켓플레이스 (예: 당근마켓, 번개장터)",
+            "price": 0.0,
+            "confidence": 50.0,
+            "fraud_risk": 30.0,
+            "negotiation_success": 60.0,
+            "expected_profit_rate": 20.0,
+            "details": "안녕하세요, 제품에 관심이 있습니다. 제품의 상태와 사용 기간, 보증 여부 등을 자세히 알려주시면 감사하겠습니다. 시장 가격을 참고하여 합리적인 가격으로 협상 가능하신지 궁금합니다. (예상 최종 가격: $1,200)",
+            "raw": "{\n  \"recommendation\": \"먼저, 제품의 상태와 사용 기간, 보증 여부 등을 확인하세요. 시장 가격을 조사하여 합리적인 가격대를 제시하고, 필요하다면 전문가의 검사를 요청하세요.\",\n  \"platform\": \"중고마켓플레이스 (예: 당근마켓, 번개장터)\",\n  \"price\": 0,\n  \"confidence\": 50,\n  \"fraud_risk\": 30,\n  \"negotiation_success\": 60,\n  \"expected_profit_rate\": 20,\n  \"details\": \"안녕하세요, 제품에 관심이 있습니다. 제품의 상태와 사용 기간, 보증 여부 등을 자세히 알려주시면 감사하겠습니다. 시장 가격을 참고하여 합리적인 가격으로 협상 가능하신지 궁금합니다. (예상 최종 가격: $1,200)\"\n}",
+            "latency_ms": 3271.6200914382935,
+            "cost_usd": 0.0,
+            "ok": true,
+            "error": "",
+            "source": "api",
+            "metrics": {
+              "lowest_price": 55.0,
+              "response_speed": 0.03,
+              "negotiation_success": 60.0,
+              "trade_profit": 40.0,
+              "recommendation_accuracy": 50.0,
+              "fraud_avoidance": 70.0,
+              "total": 46.9
+            }
+          },
+          "results": [
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "negotiate",
+              "recommendation": "먼저, 제품의 상태와 사용 기간, 보증 여부 등을 확인하세요. 시장 가격을 조사하여 합리적인 가격대를 제시하고, 필요하다면 전문가의 검사를 요청하세요.",
+              "platform": "중고마켓플레이스 (예: 당근마켓, 번개장터)",
+              "price": 0.0,
+              "confidence": 50.0,
+              "fraud_risk": 30.0,
+              "negotiation_success": 60.0,
+              "expected_profit_rate": 20.0,
+              "details": "안녕하세요, 제품에 관심이 있습니다. 제품의 상태와 사용 기간, 보증 여부 등을 자세히 알려주시면 감사하겠습니다. 시장 가격을 참고하여 합리적인 가격으로 협상 가능하신지 궁금합니다. (예상 최종 가격: $1,200)",
+              "raw": "{\n  \"recommendation\": \"먼저, 제품의 상태와 사용 기간, 보증 여부 등을 확인하세요. 시장 가격을 조사하여 합리적인 가격대를 제시하고, 필요하다면 전문가의 검사를 요청하세요.\",\n  \"platform\": \"중고마켓플레이스 (예: 당근마켓, 번개장터)\",\n  \"price\": 0,\n  \"confidence\": 50,\n  \"fraud_risk\": 30,\n  \"negotiation_success\": 60,\n  \"expected_profit_rate\": 20,\n  \"details\": \"안녕하세요, 제품에 관심이 있습니다. 제품의 상태와 사용 기간, 보증 여부 등을 자세히 알려주시면 감사하겠습니다. 시장 가격을 참고하여 합리적인 가격으로 협상 가능하신지 궁금합니다. (예상 최종 가격: $1,200)\"\n}",
+              "latency_ms": 3271.6200914382935,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 55.0,
+                "response_speed": 0.03,
+                "negotiation_success": 60.0,
+                "trade_profit": 40.0,
+                "recommendation_accuracy": 50.0,
+                "fraud_avoidance": 70.0,
+                "total": 46.9
+              }
+            },
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "negotiate",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 16.32,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 72.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.02998495101928711,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.51,
+                "response_speed": 60.0,
+                "negotiation_success": 72.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 42.03
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "negotiate",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 16.48,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 72.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 1421.886459827423,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.54,
+                "response_speed": 0.07,
+                "negotiation_success": 72.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 32.15
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "negotiate",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 16.24,
+              "confidence": 74.0,
+              "fraud_risk": 24.0,
+              "negotiation_success": 72.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 11019.577722072601,
+              "cost_usd": 0.000195,
+              "ok": false,
+              "error": "non-json response",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.01,
+                "negotiation_success": 72.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 39.0,
+                "fraud_avoidance": 76.0,
+                "total": 31.18
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 16.24,
+            "max_price": 16.48,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123125.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 56.26888888888889,
+            "avg_latency_ms": 0.022259129418267146,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 52.93222222222222,
+            "avg_latency_ms": 480.9756451712714,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 50.20666666666667,
+            "avg_latency_ms": 2518.597803009881,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.22222222222223
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 46.9,
+            "avg_latency_ms": 3271.6200914382935,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 70.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 43.59444444444445,
+            "avg_latency_ms": 2533.3485633532205,
+            "avg_cost_usd": 4.319444444444444e-05,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 42.03,
+            "avg_latency_ms": 0.02998495101928711,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 32.15,
+            "avg_latency_ms": 1421.886459827423,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 31.18,
+            "avg_latency_ms": 11019.577722072601,
+            "avg_cost_usd": 0.000195,
+            "avg_fraud_avoidance": 76.0
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "매도",
+        "scenario": "sell",
+        "message": "내가 가진 iPad Pro 팔고 싶어"
+      },
+      "result": {
+        "ok": true,
+        "run_id": 11,
+        "task": {
+          "scenario": "sell",
+          "message": "내가 가진 iPad Pro 팔고 싶어",
+          "product_name": "내가 가진 iPad Pro",
+          "budget": null,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "매도",
+            "scenario": "sell"
+          }
+        },
+        "candidate_count": 10,
+        "candidates": [
+          {
+            "name": "UGREEN 4 Ports, USB C to USB Hub with 4 USB 3.0, USB C Splitter for Laptop, Mac Pro, iMac, iPad Pro, Chromebook, Pixelbo",
+            "platform": "Newegg",
+            "price_usd": 16.39,
+            "source_id": "global_products:6577",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/1DN-043F-000C7",
+            "confidence": 0.75
+          },
+          {
+            "name": "UGREEN Tablet Stand Holder Adjustable Protable Desktop Holder Dock Compatible for iPad 10.2 iPad Pro 11 Inch iPad 9.7 iP",
+            "platform": "Newegg",
+            "price_usd": 16.99,
+            "source_id": "global_products:3511",
+            "seller": "Newegg",
+            "url": "https://www.newegg.com/p/0SB-0214-000T0",
+            "confidence": 0.75
+          },
+          {
+            "name": "해외 크루아상 크로와상 빵 모양 입체 무선 이어폰 AirPods 에어팟 1 2 3 PRO 케이",
+            "platform": "11번가",
+            "price_usd": 5.291471911103272,
+            "source_id": "products:39005",
+            "seller": "YYDS888",
+            "url": "https://www.11st.co.kr/products/8914782972?&trTypeCd=05&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "오토바이 헬멧 턱 스트랩 마운트 홀더 Gopro Hero 12 11 10 9 8 7 6 5 4 3 Yi 액션 스포츠 카메라",
+            "platform": "11번가",
+            "price_usd": 5.2982558494508405,
+            "source_id": "products:87777",
+            "seller": "제이케이18",
+            "url": "https://www.11st.co.kr/products/9164924349?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "범용 자동차 전화 홀더 중력 모바일 스탠드 GPS 지원 IPhone 14 13 12 11 Pro Max Xr Xiaomi Samsung 용 자동 에어 벤트 마운트",
+            "platform": "11번가",
+            "price_usd": 5.372879171274092,
+            "source_id": "products:23991",
+            "seller": "두루비",
+            "url": "https://www.11st.co.kr/products/9304524845?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "모아식 iPhone 14 8 7 6S Plus 13 12 Pro XS Max XR SE 고속 충전 코드 데이터 동기화 라인 1m 2m 3m 용 원",
+            "platform": "11번가",
+            "price_usd": 5.651020643524392,
+            "source_id": "products:26018",
+            "seller": "마켓알",
+            "url": "https://www.11st.co.kr/products/9308467408?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "GoPro Hero13 12 10 9 8 액션 스포츠 카메라 홀더 오토바이 휴대 전화 용 헬멧 스탠드 마운트",
+            "platform": "11번가",
+            "price_usd": 5.725643965347643,
+            "source_id": "products:87869",
+            "seller": "가양화이브",
+            "url": "https://www.11st.co.kr/products/9229543236?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "Macbook Pro Air 용 소프트 실리콘 13 15 16 M1 M2 M3 A2442 A2485 A2992 A2179 A2338 A3113 먼지 플매트",
+            "platform": "11번가",
+            "price_usd": 5.861322732299009,
+            "source_id": "products:5627",
+            "seller": "나비치",
+            "url": "https://www.11st.co.kr/products/9266735985?&trTypeCd=05&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "해외오토바이 헬멧 턱 스트랩 마운트 홀더 Gopro Hero 12 9 8 7 6 5 4 3 Yi 액션 스포츠 카메라 액세서리",
+            "platform": "11번가",
+            "price_usd": 5.915594239079556,
+            "source_id": "products:87824",
+            "seller": "유진종합상사2",
+            "url": "https://www.11st.co.kr/products/9043275611?&trTypeCd=MAS101&trCtgrNo=585021&checkCtlgPrd=true",
+            "confidence": 0.75
+          },
+          {
+            "name": "BOSTANTEN Clear Bag for Women Stadium Approved Clear Bags Crossbody Purse Trendy for Concerts Sports Events Global Recyc",
+            "platform": "Amazon",
+            "price_usd": 5.99,
+            "source_id": "global_products:485",
+            "seller": "Amazon",
+            "url": "https://www.amazon.com/dp/B0DZB59NCR",
+            "confidence": 0.75
+          }
+        ],
+        "task_summary": {
+          "task_type": "sell",
+          "product": "내가 가진 iPad Pro",
+          "target_price": null,
+          "best_comparable_price": 16.99,
+          "best_platform": "Newegg"
+        },
+        "comparison": {
+          "winner": "Claude",
+          "winner_result": {
+            "agent": "Claude",
+            "model": "claude-3-5-sonnet-latest",
+            "scenario": "sell",
+            "recommendation": "UGREEN Tablet Stand Holder Adjustable Protable Desktop Holder Dock Compatible for iPad 10.2 iPad Pro 11 Inch iPad 9.7 iP 판매가는 $16.31 근처가 적정합니다.",
+            "platform": "Newegg",
+            "price": 16.64,
+            "confidence": 82.0,
+            "fraud_risk": 16.0,
+            "negotiation_success": 58.0,
+            "expected_profit_rate": 0.0,
+            "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+            "raw": "",
+            "latency_ms": 0.0989990234375,
+            "cost_usd": 0.0,
+            "ok": false,
+            "error": "ANTHROPIC_API_KEY is not configured",
+            "source": "local-fallback",
+            "metrics": {
+              "lowest_price": 99.05,
+              "response_speed": 60.0,
+              "negotiation_success": 58.0,
+              "trade_profit": 0.0,
+              "recommendation_accuracy": 47.0,
+              "fraud_avoidance": 84.0,
+              "total": 39.69
+            }
+          },
+          "results": [
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "sell",
+              "recommendation": "UGREEN Tablet Stand Holder Adjustable Protable Desktop Holder Dock Compatible for iPad 10.2 iPad Pro 11 Inch iPad 9.7 iP 판매가는 $16.31 근처가 적정합니다.",
+              "platform": "Newegg",
+              "price": 16.64,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.0989990234375,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.05,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 39.69
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "sell",
+              "recommendation": "UGREEN Tablet Stand Holder Adjustable Protable Desktop Holder Dock Compatible for iPad 10.2 iPad Pro 11 Inch iPad 9.7 iP 판매가는 $16.31 근처가 적정합니다.",
+              "platform": "Newegg",
+              "price": 16.8,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 716.8014168739319,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.14,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 30.24
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "sell",
+              "recommendation": "UGREEN Tablet Stand Holder Adjustable Protable Desktop Holder Dock Compatible for iPad 10.2 iPad Pro 11 Inch iPad 9.7 iP 판매가는 $16.31 근처가 적정합니다.",
+              "platform": "11번가",
+              "price": 16.56,
+              "confidence": 74.0,
+              "fraud_risk": 24.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 9841.525187969208,
+              "cost_usd": 0.00060125,
+              "ok": false,
+              "error": "non-json response",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.57,
+                "response_speed": 0.01,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 39.0,
+                "fraud_avoidance": 76.0,
+                "total": 28.63
+              }
+            },
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "sell",
+              "recommendation": "iPad Pro를 판매하려면 11번가나 네이버 쇼핑 등 국내 온라인 플랫폼을 활용하는 것이 좋습니다.",
+              "platform": "11번가",
+              "price": 0.0,
+              "confidence": 0.8,
+              "fraud_risk": 0.1,
+              "negotiation_success": 0.7,
+              "expected_profit_rate": 0.6,
+              "details": "제목: 사용감 적은 iPad Pro 판매\n상품 설명: 거의 새상품에 가까운 iPad Pro를 판매합니다. 사용 기간은 6개월 정도이며, 보호필름과 케이스를 사용하여 관리했습니다. 모든 기능이 정상적으로 작동하며, 외관상 큰 손상은 없습니다.\n가격: 시장 가격을 고려하여 600,000원으로 설정하였습니다.",
+              "raw": "{\n  \"recommendation\": \"iPad Pro를 판매하려면 11번가나 네이버 쇼핑 등 국내 온라인 플랫폼을 활용하는 것이 좋습니다.\",\n  \"platform\": \"11번가\",\n  \"price\": 0,\n  \"confidence\": 0.8,\n  \"fraud_risk\": 0.1,\n  \"negotiation_success\": 0.7,\n  \"expected_profit_rate\": 0.6,\n  \"details\": \"제목: 사용감 적은 iPad Pro 판매\\n상품 설명: 거의 새상품에 가까운 iPad Pro를 판매합니다. 사용 기간은 6개월 정도이며, 보호필름과 케이스를 사용하여 관리했습니다. 모든 기능이 정상적으로 작동하며, 외관상 큰 손상은 없습니다.\\n가격: 시장 가격을 고려하여 600,000원으로 설정하였습니다.\"\n}",
+              "latency_ms": 3487.3983192443848,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 0.0,
+                "response_speed": 0.03,
+                "negotiation_success": 0.7,
+                "trade_profit": 1.2,
+                "recommendation_accuracy": 0.8,
+                "fraud_avoidance": 99.9,
+                "total": 14.44
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 16.56,
+            "max_price": 16.8,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123135.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 56.26888888888889,
+            "avg_latency_ms": 0.022259129418267146,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 52.93222222222222,
+            "avg_latency_ms": 480.9756451712714,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 50.20666666666667,
+            "avg_latency_ms": 2518.597803009881,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.22222222222223
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 46.9,
+            "avg_latency_ms": 3271.6200914382935,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 70.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 43.59444444444445,
+            "avg_latency_ms": 2533.3485633532205,
+            "avg_cost_usd": 4.319444444444444e-05,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 42.03,
+            "avg_latency_ms": 0.02998495101928711,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.0989990234375,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 32.15,
+            "avg_latency_ms": 1421.886459827423,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 31.18,
+            "avg_latency_ms": 11019.577722072601,
+            "avg_cost_usd": 0.000195,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 30.24,
+            "avg_latency_ms": 716.8014168739319,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 28.63,
+            "avg_latency_ms": 9841.525187969208,
+            "avg_cost_usd": 0.00060125,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 14.44,
+            "avg_latency_ms": 3487.3983192443848,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 99.9
+          }
+        ]
+      }
+    },
+    {
+      "case": {
+        "name": "차익거래",
+        "scenario": "arbitrage",
+        "message": "100달러 예산으로 차익거래 가능한 상품 찾아줘",
+        "budget": 100
+      },
+      "result": {
+        "ok": true,
+        "run_id": 12,
+        "task": {
+          "scenario": "arbitrage",
+          "message": "100달러 예산으로 차익거래 가능한 상품 찾아줘",
+          "product_name": "100달러 예산으로 차익거래 가능한 상품",
+          "budget": 100.0,
+          "preferred_platform": "",
+          "target_price": null,
+          "seller_info": "",
+          "start_price": null,
+          "category": "",
+          "currency": "USD",
+          "metadata": {
+            "name": "차익거래",
+            "scenario": "arbitrage",
+            "budget": 100
+          }
+        },
+        "candidate_count": 0,
+        "candidates": [],
+        "task_summary": {
+          "task_type": "arbitrage",
+          "category": "100달러 예산으로 차익거래 가능한 상품",
+          "budget": 100.0,
+          "best_profit_usd": null,
+          "best_route": null
+        },
+        "comparison": {
+          "winner": "Claude",
+          "winner_result": {
+            "agent": "Claude",
+            "model": "claude-3-5-sonnet-latest",
+            "scenario": "arbitrage",
+            "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+            "platform": "검증 필요",
+            "price": 102.0,
+            "confidence": 82.0,
+            "fraud_risk": 16.0,
+            "negotiation_success": 58.0,
+            "expected_profit_rate": 0.0,
+            "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+            "raw": "",
+            "latency_ms": 0.016644954681396484,
+            "cost_usd": 0.0,
+            "ok": false,
+            "error": "ANTHROPIC_API_KEY is not configured",
+            "source": "local-fallback",
+            "metrics": {
+              "lowest_price": 99.03,
+              "response_speed": 60.0,
+              "negotiation_success": 58.0,
+              "trade_profit": 0.0,
+              "recommendation_accuracy": 47.0,
+              "fraud_avoidance": 84.0,
+              "total": 39.69
+            }
+          },
+          "results": [
+            {
+              "agent": "Claude",
+              "model": "claude-3-5-sonnet-latest",
+              "scenario": "arbitrage",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 102.0,
+              "confidence": 82.0,
+              "fraud_risk": 16.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 0.016644954681396484,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "ANTHROPIC_API_KEY is not configured",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 99.03,
+                "response_speed": 60.0,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 47.0,
+                "fraud_avoidance": 84.0,
+                "total": 39.69
+              }
+            },
+            {
+              "agent": "GPT-5.5",
+              "model": "gpt-5.5",
+              "scenario": "arbitrage",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 103.0,
+              "confidence": 78.0,
+              "fraud_risk": 20.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 1057.981517314911,
+              "cost_usd": 0.0,
+              "ok": false,
+              "error": "Client error '429 Too Many Requests' for url 'https://api.openai.com/v1/responses'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 100.0,
+                "response_speed": 0.09,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 43.0,
+                "fraud_avoidance": 80.0,
+                "total": 30.23
+              }
+            },
+            {
+              "agent": "Gemini",
+              "model": "gemini-2.5-pro",
+              "scenario": "arbitrage",
+              "recommendation": "로컬 후보가 부족해 외부 가격 검증 후 진행이 필요합니다.",
+              "platform": "검증 필요",
+              "price": 101.5,
+              "confidence": 74.0,
+              "fraud_risk": 24.0,
+              "negotiation_success": 58.0,
+              "expected_profit_rate": 0.0,
+              "details": "API 응답이 없거나 키가 없어 로컬 상품 DB와 규칙 기반 평가로 생성했습니다.",
+              "raw": "",
+              "latency_ms": 10459.235706806183,
+              "cost_usd": 0.00019625,
+              "ok": false,
+              "error": "non-json response",
+              "source": "local-fallback",
+              "metrics": {
+                "lowest_price": 98.54,
+                "response_speed": 0.01,
+                "negotiation_success": 58.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 39.0,
+                "fraud_avoidance": 76.0,
+                "total": 28.62
+              }
+            },
+            {
+              "agent": "Edenclaw AI",
+              "model": "Qwen/Qwen2.5-72B-Instruct",
+              "scenario": "arbitrage",
+              "recommendation": "현재 로컬 마켓플레이스에서 적합한 차익거래 후보가 없습니다.",
+              "platform": "N/A",
+              "price": 0.0,
+              "confidence": 0.0,
+              "fraud_risk": 0.0,
+              "negotiation_success": 0.0,
+              "expected_profit_rate": 0.0,
+              "details": "로컬 마켓플레이스에서 100달러 예산 내에서 차익거래가 가능한 상품이 발견되지 않았습니다. 다른 플랫폼이나 카테고리를 검토하거나 예산을 조정해 보세요. 또한, 시장 동향과 가격 변동을 지속적으로 모니터링하는 것이 좋습니다.",
+              "raw": "{\n  \"recommendation\": \"현재 로컬 마켓플레이스에서 적합한 차익거래 후보가 없습니다.\",\n  \"platform\": \"N/A\",\n  \"price\": 0,\n  \"confidence\": 0,\n  \"fraud_risk\": 0,\n  \"negotiation_success\": 0,\n  \"expected_profit_rate\": 0,\n  \"details\": \"로컬 마켓플레이스에서 100달러 예산 내에서 차익거래가 가능한 상품이 발견되지 않았습니다. 다른 플랫폼이나 카테고리를 검토하거나 예산을 조정해 보세요. 또한, 시장 동향과 가격 변동을 지속적으로 모니터링하는 것이 좋습니다.\"\n}",
+              "latency_ms": 2529.1549620628357,
+              "cost_usd": 0.0,
+              "ok": true,
+              "error": "",
+              "source": "api",
+              "metrics": {
+                "lowest_price": 0.0,
+                "response_speed": 0.04,
+                "negotiation_success": 0.0,
+                "trade_profit": 0.0,
+                "recommendation_accuracy": 0.0,
+                "fraud_avoidance": 100.0,
+                "total": 14.01
+              }
+            }
+          ],
+          "summary": {
+            "min_price": 101.5,
+            "max_price": 103.0,
+            "fastest_ms": 1.0,
+            "weights": {
+              "lowest_price": 0.22,
+              "response_speed": 0.14,
+              "negotiation_success": 0.16,
+              "trade_profit": 0.16,
+              "recommendation_accuracy": 0.18,
+              "fraud_avoidance": 0.14
+            }
+          }
+        },
+        "report_path": "/NHNHOME/WORKSPACE/0426030063_A/edenclaw/edenclaw-ai/reports/multi_ai_comparison_20260503_123146.html",
+        "learning": [
+          {
+            "agent": "Claude",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 56.26888888888889,
+            "avg_latency_ms": 0.022259129418267146,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 52.93222222222222,
+            "avg_latency_ms": 480.9756451712714,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 50.20666666666667,
+            "avg_latency_ms": 2518.597803009881,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 91.22222222222223
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 46.9,
+            "avg_latency_ms": 3271.6200914382935,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 70.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "buy",
+            "runs": 9,
+            "avg_score": 43.59444444444445,
+            "avg_latency_ms": 2533.3485633532205,
+            "avg_cost_usd": 4.319444444444444e-05,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 42.03,
+            "avg_latency_ms": 0.02998495101928711,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.016644954681396484,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "Claude",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 39.69,
+            "avg_latency_ms": 0.0989990234375,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 84.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 32.15,
+            "avg_latency_ms": 1421.886459827423,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "negotiate",
+            "runs": 1,
+            "avg_score": 31.18,
+            "avg_latency_ms": 11019.577722072601,
+            "avg_cost_usd": 0.000195,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 30.24,
+            "avg_latency_ms": 716.8014168739319,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "GPT-5.5",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 30.23,
+            "avg_latency_ms": 1057.981517314911,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 80.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 28.63,
+            "avg_latency_ms": 9841.525187969208,
+            "avg_cost_usd": 0.00060125,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Gemini",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 28.62,
+            "avg_latency_ms": 10459.235706806183,
+            "avg_cost_usd": 0.00019625,
+            "avg_fraud_avoidance": 76.0
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "sell",
+            "runs": 1,
+            "avg_score": 14.44,
+            "avg_latency_ms": 3487.3983192443848,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 99.9
+          },
+          {
+            "agent": "Edenclaw AI",
+            "scenario": "arbitrage",
+            "runs": 1,
+            "avg_score": 14.01,
+            "avg_latency_ms": 2529.1549620628357,
+            "avg_cost_usd": 0.0,
+            "avg_fraud_avoidance": 100.0
+          }
+        ]
+      }
+    }
+  ],
+  "cost_analysis": [
+    {
+      "agent": "GPT-5.5",
+      "input_per_1m": 5.0,
+      "output_per_1m": 30.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.0225,
+      "estimated_monthly_1000": 22.5,
+      "note": "OpenAI gpt-5.5 standard"
+    },
+    {
+      "agent": "GPT-4o",
+      "input_per_1m": 2.5,
+      "output_per_1m": 10.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.00875,
+      "estimated_monthly_1000": 8.75,
+      "note": "OpenAI fallback"
+    },
+    {
+      "agent": "Claude",
+      "input_per_1m": 5.0,
+      "output_per_1m": 25.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.02,
+      "estimated_monthly_1000": 20.0,
+      "note": "Claude Opus 4.5"
+    },
+    {
+      "agent": "Gemini",
+      "input_per_1m": 1.25,
+      "output_per_1m": 10.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.006875,
+      "estimated_monthly_1000": 6.875,
+      "note": "Gemini 2.5 Pro <=200K prompt"
+    },
+    {
+      "agent": "Edenclaw AI",
+      "input_per_1m": 0.0,
+      "output_per_1m": 0.0,
+      "assumed_input_tokens": 1500,
+      "assumed_output_tokens": 500,
+      "estimated_per_request": 0.0,
+      "estimated_monthly_1000": 0.0,
+      "note": "self-hosted vLLM; excludes electricity"
+    }
+  ]
+}

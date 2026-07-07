@@ -26,3 +26,17 @@ finetune/datasets/
 *.onnx
 *.parquet
 tsconfig.tsbuildinfo
+.vercel
+
+# 에덴클로 OMX 자율 루프 격리 샌드박스 / 임시 빌드 설정
+.edenclaw-sandbox/
+.tsbuild-*.json
+.next-dev/
+
+# 업로드된 사용자 콘텐츠 / 릴리즈 아카이브 (소스 아님)
+public/uploads/
+public/downloads/
+edenclaw_release_2026.zip
+
+# 대용량 데이터/임베딩/인덱스 (소스 아님, GitHub 100MB 제한 초과)
+data/

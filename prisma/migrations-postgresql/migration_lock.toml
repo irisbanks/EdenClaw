@@ -1,0 +1,2 @@
+# Supabase runtime migration history. The legacy SQLite history remains in prisma/migrations.
+provider = "postgresql"

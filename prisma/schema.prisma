@@ -4,7 +4,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
 }
 
 model User {
@@ -30,6 +35,7 @@ model User {
 
   @@index([sponsorId])
   @@index([parentId])
+  @@unique([parentId, position])
 }
 
 // 좌/우 다리별 누적 PV/BV 원장 (무한 뎁스 실적 + 이월 관리)
@@ -52,6 +58,7 @@ model TokenQuota {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   allocated BigInt   @default(2000000) // 최초 가입 시 기본 제공량
   consumed  BigInt   @default(0) // 실제 에이전트 구동 시 차감되는 양
+  isOverdraftAdvanced Boolean @default(false) // 미래 수당 담보 선지급 가스가 발급된 상태
   updatedAt DateTime @updatedAt
 }
 
@@ -209,9 +216,13 @@ model AgentLearning {
 
 model Product {
   id            String               @id @default(cuid())
+  name          String               @default("")
+  type          ProductType          @default(PHYSICAL)
   title         String
   description   String
   price         Float
+  pvValue       Float                @default(0.0)
+  bvValue       Float                @default(0.0)
   currency      String               @default("ET")
   category      String               @default("general")
   tags          String               @default("[]")

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getQueueStats } from '@/lib/services/settlementQueue';
 
 export async function GET() {
   const checks: Record<string, unknown> = {};
@@ -15,9 +16,42 @@ export async function GET() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     const userCount = await prisma.user.count();
-    checks.database = { status: 'up', type: 'SQLite (better-sqlite3)', userCount };
+    checks.database = { status: 'up', type: 'PostgreSQL (Supabase)', userCount };
   } catch (e) {
     checks.database = { status: 'down', error: String(e) };
+  }
+
+  // 바이너리 장부 핵심 불변식 + 백그라운드 정산 큐 상태
+  try {
+    const [audit] = await prisma.$queryRaw<Array<{
+      missingQuota: number;
+      missingLeg: number;
+      duplicateSlots: number;
+      invalidLegs: number;
+      overdrawn: number;
+    }>>`
+      SELECT
+        (SELECT COUNT(*)::int FROM "User" u LEFT JOIN "TokenQuota" q ON q."userId" = u.id WHERE q.id IS NULL) AS "missingQuota",
+        (SELECT COUNT(*)::int FROM "User" u LEFT JOIN "LegBalance" l ON l."userId" = u.id WHERE l.id IS NULL) AS "missingLeg",
+        (SELECT COUNT(*)::int FROM (
+          SELECT "parentId", "position" FROM "User"
+          WHERE "parentId" IS NOT NULL
+          GROUP BY "parentId", "position" HAVING COUNT(*) > 1
+        ) duplicate_slots) AS "duplicateSlots",
+        (SELECT COUNT(*)::int FROM "LegBalance"
+          WHERE "leftPV" < 0 OR "rightPV" < 0 OR "leftBV" < 0 OR "rightBV" < 0) AS "invalidLegs",
+        (SELECT COUNT(*)::int FROM "TokenQuota"
+          WHERE "consumed" < 0 OR "consumed" > "allocated") AS "overdrawn"
+    `;
+    const violations = Object.values(audit).reduce((sum, value) => sum + value, 0);
+    checks.binaryLedger = {
+      status: violations === 0 ? 'ok' : 'error',
+      violations,
+      queue: getQueueStats(),
+      verification: 'npm run verify:world-class',
+    };
+  } catch (e) {
+    checks.binaryLedger = { status: 'error', error: String(e) };
   }
 
   // ── AI MARKET V2 기능 상태 체크 ───────────────────────────────
@@ -92,9 +126,12 @@ export async function GET() {
 
   const allV2Ok = ['negotiation', 'verificationV2', 'recommend', 'voiceShop', 'smartMatch', 'sellerReputation', 'priceTrend']
     .every(k => (checks[k] as { status: string })?.status === 'ok');
+  const coreOk =
+    (checks.database as { status?: string })?.status === 'up' &&
+    (checks.binaryLedger as { status?: string })?.status === 'ok';
 
   return NextResponse.json({
-    status: allV2Ok ? 'healthy' : 'degraded',
+    status: coreOk && allV2Ok ? 'healthy' : 'degraded',
     version: 'AI Market v2',
     timestamp: new Date().toISOString(),
     gpu: 'NVIDIA B200 x4 (GPU 1-3 for AI, GPU 0 for trading bot)',

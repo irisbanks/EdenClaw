@@ -1,12 +1,29 @@
 import { prisma } from '@/lib/prisma';
 import { redis, QUOTA_TTL_SEC, quotaKey } from '@/lib/redis';
 import { enqueueSettlement } from '@/lib/services/settlementQueue';
+import { executeOverdraftLedgerSwap } from '@/lib/services/overdraftLedger';
 
 /** estimatedTokens 미지정 시 기본 예약치 */
 export const DEFAULT_ESTIMATE = 1000;
 
 /** 토큰 소비 → 상위 라인 PV 환산율. 기본 10,000 토큰 = 1 PV (env 로 조정). */
 const TOKENS_PER_PV = Number(process.env.TOKENS_PER_PV) || 10_000;
+
+async function readQuotaCache(userId: string): Promise<string | null> {
+  try {
+    return await redis.get(quotaKey(userId));
+  } catch {
+    return null;
+  }
+}
+
+async function writeQuotaCache(userId: string, remaining: number): Promise<void> {
+  try {
+    await redis.set(quotaKey(userId), Math.trunc(remaining).toString(), 'EX', QUOTA_TTL_SEC);
+  } catch {
+    // Redis is a cache. Prisma remains the durable quota ledger.
+  }
+}
 
 /** 토큰 고갈 시 클라이언트에 내려줄 결제 유도 페이로드 */
 export const LOCKED_PAYLOAD = {
@@ -26,7 +43,7 @@ export type QuotaCheck =
  * Redis 1차 초고속 조회 → 미스 시 DB 조회 후 캐시 워밍.
  */
 export async function checkQuota(userId: string, estimatedTokens?: number): Promise<QuotaCheck> {
-  const cached = await redis.get(quotaKey(userId));
+  const cached = await readQuotaCache(userId);
   let remaining: number;
 
   if (cached === null) {
@@ -34,12 +51,20 @@ export async function checkQuota(userId: string, estimatedTokens?: number): Prom
     if (!dbQuota) return { status: 'NO_QUOTA' };
     // allocated / consumed 는 BigInt → 안전하게 차감 후 Number 캐스팅
     remaining = Number(dbQuota.allocated - dbQuota.consumed);
-    await redis.set(quotaKey(userId), remaining.toString(), 'EX', QUOTA_TTL_SEC);
+    await writeQuotaCache(userId, remaining);
   } else {
     remaining = parseInt(cached, 10);
   }
 
   const needed = Number(estimatedTokens) || DEFAULT_ESTIMATE;
+  if (remaining <= 0) {
+    const swap = await executeOverdraftLedgerSwap(userId, Math.max(needed, DEFAULT_ESTIMATE));
+    if (swap.ok) {
+      remaining = swap.quota.remaining;
+      if (remaining >= needed) return { status: 'ALLOWED', remaining };
+    }
+  }
+
   if (remaining <= 0 || remaining < needed) {
     return { status: 'LOCKED', remaining };
   }
@@ -66,7 +91,7 @@ export async function settleUsage(userId: string, actualTokens: number): Promise
   });
 
   const newRemaining = Number(updated.allocated - updated.consumed);
-  await redis.set(quotaKey(userId), newRemaining.toString(), 'EX', QUOTA_TTL_SEC);
+  await writeQuotaCache(userId, newRemaining);
 
   // 소비량을 PV 로 환산해 상위 라인 실적으로 전파 (BM: 하위 소비 = 상위 실적)
   const consumptionPV = tokens / TOKENS_PER_PV;

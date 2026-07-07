@@ -21,78 +21,69 @@ export class DualShieldMLMEngine {
    *
    * 결제 PV/BV 의 상위 라인 전파는 webhook 의 propagateVolumeUpline 이 담당하며,
    * 이 함수는 전파로 갱신된 원장을 기준으로 동작한다.
-   */
+  */
   public static async settleMatchingBonus(userId: string): Promise<void> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: { legBalance: true },
-      });
-      if (!user || user.subscriptionStatus !== 'ACTIVE') return;
+      const settled = await prisma.$transaction(async (tx) => {
+        // PostgreSQL 세션이 몇 대로 늘어나도 같은 유저의 정산은 반드시 직렬화한다.
+        // 트랜잭션 범위 advisory lock 이므로 성공/실패와 관계없이 자동 해제된다.
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${userId}, 0))::text AS lock_result`;
 
-      const lb = user.legBalance;
-      if (!lb) return;
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          include: { legBalance: true },
+        });
+        if (!user || user.subscriptionStatus !== 'ACTIVE' || !user.legBalance) return null;
 
-      const leftPV = new Decimal(lb.leftPV);
-      const rightPV = new Decimal(lb.rightPV);
-      const leftBV = new Decimal(lb.leftBV);
-      const rightBV = new Decimal(lb.rightBV);
+        const leftPV = new Decimal(user.legBalance.leftPV);
+        const rightPV = new Decimal(user.legBalance.rightPV);
+        const leftBV = new Decimal(user.legBalance.leftBV);
+        const rightBV = new Decimal(user.legBalance.rightBV);
+        const balances = [leftPV, rightPV, leftBV, rightBV];
+        if (balances.some((value) => !value.isFinite() || value.isNegative())) {
+          throw new Error(`유저 ${userId}의 바이너리 원장에 유효하지 않은 값이 있습니다.`);
+        }
 
-      // 양쪽 다리에 실적이 있어야 매칭 발생
-      const matchedPV = Decimal.min(leftPV, rightPV);
-      if (matchedPV.lessThanOrEqualTo(0)) return;
+        // 양쪽 다리에 실적이 있어야 매칭 발생
+        const matchedPV = Decimal.min(leftPV, rightPV);
+        if (matchedPV.lessThanOrEqualTo(0)) return null;
 
-      // 매칭을 뒷받침하는 비즈니스 볼륨 = 양쪽 BV 중 작은 값 (보수적)
-      const matchedBV = Decimal.min(leftBV, rightBV);
+        // 매칭을 뒷받침하는 비즈니스 볼륨 = 양쪽 BV 중 작은 값 (보수적)
+        const matchedBV = Decimal.min(leftBV, rightBV);
 
-      // 1) 본래 발생 수당
-      const earnedBonus = matchedPV.times(MATCHING_RATE);
-      let bonus = earnedBonus;
+        // 1) 본래 발생 수당
+        const earnedBonus = matchedPV.times(MATCHING_RATE);
+        let bonus = earnedBonus;
 
-      // 2) [Dual-Shield BV Cap] 매칭 BV(실매출 마진)를 넘는 수당 차단
-      const bvCap = matchedBV.times(BV_PAYOUT_CAP_RATE);
-      if (bonus.greaterThan(bvCap)) bonus = bvCap;
+        // 2) [Dual-Shield BV Cap] 매칭 BV(실매출 마진)를 넘는 수당 차단
+        const bvCap = matchedBV.times(BV_PAYOUT_CAP_RATE);
+        if (bonus.greaterThan(bvCap)) bonus = bvCap;
 
-      // 3) [Shield] 단건 상한
-      if (bonus.greaterThan(PER_CALL_CAP)) bonus = PER_CALL_CAP;
+        // 3) [Shield] 단건 상한
+        if (bonus.greaterThan(PER_CALL_CAP)) bonus = PER_CALL_CAP;
 
-      // 4) [Shield] 1일 누적 상한 (오늘 지급된 매칭 수당 합계로 잔여 한도 계산)
-      const startOfDay = new Date();
-      startOfDay.setHours(0, 0, 0, 0);
-      const todayAgg = await prisma.transaction.aggregate({
-        where: { userId, txType: 'BONUS_MATCHING', createdAt: { gte: startOfDay } },
-        _sum: { amount: true },
-      });
-      const paidToday = new Decimal(todayAgg._sum.amount ?? 0);
-      const remainingDailyAllowance = DAILY_CAP.minus(paidToday);
-      if (remainingDailyAllowance.lessThanOrEqualTo(0)) {
-        console.warn(`[Dual-Shield] 유저 ${userId} 1일 수당 캡($${DAILY_CAP}) 도달 → 지급 차단`);
-        return;
-      }
-      if (bonus.greaterThan(remainingDailyAllowance)) bonus = remainingDailyAllowance;
+        // 4) [Shield] UTC 일일 누적 상한. advisory lock 안에서 조회/기록해 동시 초과 지급을 막는다.
+        const now = new Date();
+        const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const todayAgg = await tx.transaction.aggregate({
+          where: { userId, txType: 'BONUS_MATCHING', createdAt: { gte: startOfDay } },
+          _sum: { amount: true },
+        });
+        const paidToday = new Decimal(todayAgg._sum.amount ?? 0);
+        const remainingDailyAllowance = DAILY_CAP.minus(paidToday);
+        if (remainingDailyAllowance.lessThanOrEqualTo(0)) return null;
+        if (bonus.greaterThan(remainingDailyAllowance)) bonus = remainingDailyAllowance;
+        if (bonus.lessThanOrEqualTo(0)) return null;
 
-      if (bonus.lessThanOrEqualTo(0)) return;
+        // 5) 실제 지급한 비율만큼만 볼륨 소진 → 미지급분은 이월
+        const paidFraction = bonus.dividedBy(earnedBonus);
+        const consumedPV = matchedPV.times(paidFraction);
+        // 지급액을 실제로 담보한 매칭 BV를 양쪽에서 동일하게 소진한다.
+        // PV 비율만으로 BV를 소진하면 BV cap으로 깎인 원장을 반복 정산해 과지급할 수 있다.
+        const matchedBVConsumed = Decimal.min(matchedBV, bonus.dividedBy(BV_PAYOUT_CAP_RATE));
+        const leftBVConsumed = Decimal.min(leftBV, matchedBVConsumed);
+        const rightBVConsumed = Decimal.min(rightBV, matchedBVConsumed);
 
-      // 5) 실제 지급한 비율만큼만 볼륨 소진 → 미지급분은 이월
-      //    paidFraction = 지급수당 / 본래수당 (0 < f <= 1)
-      const paidFraction = bonus.dividedBy(earnedBonus);
-      const consumedPV = matchedPV.times(paidFraction);
-
-      // 좌/우 PV 는 동일하게 consumedPV 만큼 차감, BV 는 소진 PV 비율로 비례 차감
-      const leftBVConsumed = leftPV.greaterThan(0)
-        ? leftBV.times(consumedPV.dividedBy(leftPV))
-        : new Decimal(0);
-      const rightBVConsumed = rightPV.greaterThan(0)
-        ? rightBV.times(consumedPV.dividedBy(rightPV))
-        : new Decimal(0);
-
-      const newLeftPV = Decimal.max(0, leftPV.minus(consumedPV));
-      const newRightPV = Decimal.max(0, rightPV.minus(consumedPV));
-      const newLeftBV = Decimal.max(0, leftBV.minus(leftBVConsumed));
-      const newRightBV = Decimal.max(0, rightBV.minus(rightBVConsumed));
-
-      // 안정적인 DB 트랜잭션 처리 (지갑 가산 + 원장 차감 + 로그를 원자적으로)
-      await prisma.$transaction(async (tx) => {
         // 1. 상위 유저 지갑에 현금성 포인트(EP) 즉시 가산
         await tx.user.update({
           where: { id: userId },
@@ -103,10 +94,11 @@ export class DualShieldMLMEngine {
         await tx.legBalance.update({
           where: { userId },
           data: {
-            leftPV: newLeftPV.toNumber(),
-            rightPV: newRightPV.toNumber(),
-            leftBV: newLeftBV.toNumber(),
-            rightBV: newRightBV.toNumber(),
+            // SET 대신 원자 decrement 를 사용해 동시에 들어온 신규 실적 increment 를 보존한다.
+            leftPV: { decrement: consumedPV.toNumber() },
+            rightPV: { decrement: consumedPV.toNumber() },
+            leftBV: { decrement: leftBVConsumed.toNumber() },
+            rightBV: { decrement: rightBVConsumed.toNumber() },
           },
         });
 
@@ -117,15 +109,23 @@ export class DualShieldMLMEngine {
             txType: 'BONUS_MATCHING',
             amount: bonus.toNumber(),
             pvGenerated: consumedPV.toNumber(),
-            bvGenerated: matchedBV.times(paidFraction).toNumber(),
+            bvGenerated: matchedBVConsumed.toNumber(),
           },
         });
-      });
 
-      console.log(
-        `[Dual-Shield] 유저 ${userId} 수당 정산 완료: +${bonus.toString()} EP ` +
-          `(matchedPV=${matchedPV.toString()}, bvCap=${bvCap.toString()}, carry-forward 적용)`
-      );
+        return {
+          bonus: bonus.toString(),
+          matchedPV: matchedPV.toString(),
+          bvCap: bvCap.toString(),
+        };
+      }, { maxWait: 10_000, timeout: 30_000 });
+
+      if (settled) {
+        console.log(
+          `[Dual-Shield] 유저 ${userId} 수당 정산 완료: +${settled.bonus} EP ` +
+            `(matchedPV=${settled.matchedPV}, bvCap=${settled.bvCap}, carry-forward 적용)`
+        );
+      }
     } catch (error) {
       console.error('바이너리 수당 연산 중 치명적 오류 발생:', error);
       throw error;

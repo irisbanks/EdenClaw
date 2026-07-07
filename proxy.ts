@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+// Next.js 16: `middleware` 컨벤션 → `proxy`로 마이그레이션
+export function proxy(req: NextRequest) {
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,
